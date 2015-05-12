@@ -1,0 +1,902 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-type" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+    <title>Dating4Disabled</title>
+    	 
+ 	<!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" />  -->
+ 	<link rel="stylesheet" href="js/jquery.mobile-1.3.1/jquery.mobile-1.3.1.min.css" />
+ 	<link rel="stylesheet" href="js/jquery.mobile-1.3.1/d4d-theme.min.css" />
+ 	
+	<link rel="stylesheet" href="css/index.css" />    
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>	
+	<!-- <script src="http://code.jquery.com/mobile/latest/jquery.mobile.min.js"></script>  -->
+	<script src="js/jquery.mobile-1.3.1/jquery.mobile-1.3.1.min.js"></script>
+	    
+	
+	<!-- CDN Respositories: For production, replace lines above with these uncommented minified versions -->
+	<!-- 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+	 -->   
+	
+	
+	 
+	
+	
+	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+	<!-- <script type="text/javascript" charset="utf-8" src="PushNotification.js"></script> -->	
+	<script type="text/javascript" charset="utf-8" src="js/index.js"></script>  	
+	
+	
+		  
+	
+	
+	<!-- Add fancyBox -->
+	<link rel="stylesheet" href="js/fancybox/source/jquery.fancybox.css?v=2.1.3" type="text/css" media="screen" />
+	<script type="text/javascript" src="js/fancybox/source/jquery.fancybox.pack.js?v=2.1.3"></script>
+	
+	
+</head>
+  
+<body onLoad="initFastButtons();">
+	<input type="hidden" id="back_page" value="main_page" />
+	<div data-role="page" class="page" id="mainContainer">
+		<!--Start Header-->
+			
+		<div id="header">
+		
+			<div class="new_mes" onclick="app.getMessenger();"><div class="new_mes_count2"></div></div>
+			
+			<!--  
+			<div class="new_mes" onclick="app.getMessenger();">Messages<div class="new_mes_count2"></div></div>									
+			<div id="top_left_buttons">				
+				<div id="sign_up" onclick="app.register();"></div>
+				<div id="contact" onclick="app.contact();"></div>
+				<div id="back" onclick="app.back();"></div>				
+			</div>
+				
+			<div id="top_right_buttons">			
+				<a href="#" data-role="none" data-transition="slide" onclick="app.chooseMainPage();"><div id="logo"></div></a>
+			</div>
+			-->
+			
+			<div id="header_wrap">	
+				<div id="back" onclick="app.back();"></div>
+				<div id="logo" onclick="app.chooseMainPage();"></div>
+				<div id="logout" onclick="app.logout();"></div>
+				<div id="sign_up"><input type="button" data-theme="e" value="Sign Up" onclick="app.register();" /></div>				  
+			</div>
+		</div>
+			
+		<!--Stop Header-->
+		
+		<div style="width:100%; height:70px;"></div>
+	
+		<!--Start Login Page -->
+		<div id="login_page" class="appPage">
+			
+			<div data-role="content">
+				<div class="content_wrap"> 			
+					<form method="post" id="authForm" name="authForm" data-role="none">
+						<div id="user_txt" class="mar_top_8">E-mail or Username</div><div id="user_input"><input type="text" name="email" class="email" value="" data-role="none" maxlength="50" /></div>
+						<div class="clear"></div>
+						<div id="pass_txt" class="lineHeight_50">Password</div><div id="pass_input"><input type="password" name="password" class="password" value="" maxlength="50" data-role="none" /></div>
+						<div class="clear"></div>
+						<!-- <label><input type="checkbox" name="remember_me" value="remember_me"  /> <span>remember me</span> </label>  -->
+						<!--<div id="fog_pass"><a href="#" rel="external" data-ajax="false">I've forgot my password</a></div>-->
+						<!--<div id="login" onclick="app.sendAuthData();"></div>-->
+						<div class="right"><input type="button" value="Login" onclick="app.sendAuthData();" data-theme="e"></div>
+															
+					</form>								
+				</div>				
+			</div>		
+			
+			<div id="orange_line"></div>		
+			
+			<div data-role="content" data-scroll="false">
+				<div class="content_wrap">				
+					<div class="user_data_preview" id="udp_0">						
+						<div class="user_photo_wrap">
+							<img src="#" alt="" class="user_photo" />						
+						</div> 
+						<a href="#"><span></span></a>
+						<div class="address"></div>
+						<div class="on">ON</div>					
+					</div>
+					<div class="user_data_preview" id="udp_1">						
+						<div class="user_photo_wrap">
+							<img src="#" alt="" class="user_photo" />						
+						</div> 
+						<a href="#"><span></span></a>
+						<div class="address"></div>
+						<div class="on">ON</div>					
+					</div>
+				</div>
+			</div>			
+		</div>
+		<!--End Login Page -->
+		
+		<!--Start Main Page -->
+		<div id="main_page"  class="appPage">
+			<div data-role="content" data-scroll="false">
+				<div class="content_wrap">
+					<a href="#" onclick="app.getOnlineNow();"><div id="friends_online"></div></a>
+					<a href="#" onclick="app.getSearchForm();"><div id="search_friends"></div></a>
+					<a href="#" onclick="app.getMyProfileData();"><div id="profile"></div></a>   
+					<a href="#" onclick="app.getMessenger();" class="no_dec">
+						<div id="mail_box"><div id="new_mes_count"></div></div>
+					</a>				
+					<a href="#" id="bannerLink"><div id="why_subscr"><img src="http://m.dating4disabled.com/images/main_banner.png" /></div></a>
+					
+				</div>					
+			</div>		
+		</div>
+		<!--End Main Page -->
+		
+		
+		<!--Start Users List Page -->
+		<div id="users_list_page"  class="appPage">
+			<div data-role="content" data-scroll="false">
+				
+				<div class="sortButtonWrap">
+					<div class="sortButton" id="sortByDistance"><input type="button" onclick="app.sortByDistance();" value="Nearby" data-theme="e"></div>
+					<div class="sortButton" id="sortByEntranceTime"><input type="button" onclick="app.sortByEntranceTime();" value="Previous Results" data-theme="e"></div>
+				</div>
+				
+				<div style="width:100%; height:40px;"></div>
+				
+				
+				<div class="content_wrap">
+					
+				</div>					
+			</div>
+		</div>
+		
+		
+		
+		<!--End Users List Page -->
+		
+		
+		<!--Start Online Now Page -->
+		<div id="online_now_page"  class="appPage">
+			<div data-role="content" data-scroll="false">
+				<div class="content_wrap">
+					
+				</div>					
+			</div>
+		</div>
+		<!--End Online Now Page -->
+		
+		
+		<!--Start Search Results Page -->
+		<div id="search_results_page"  class="appPage">
+			<div data-role="content">
+				<div class="content_wrap">
+					
+				</div>					
+			</div>
+		</div>
+		<!--End Search Results Page -->
+		
+		<!--Start Search Results Page -->
+		<div id="stat_results_page"  class="appPage">
+			<div data-role="content">
+				<div class="content_wrap">
+					
+				</div>					
+			</div>
+		</div>
+		<!--End Search Results Page -->
+		
+		
+		<!--Start My Profile Page -->
+		<div id="my_profile_page" class="appPage">		
+			
+			<div class="myProfileWrap">
+			
+				<div data-role="content" data-scroll="false" class="bg_light_orange">
+					
+					<h1>My Profile</h1>
+					
+					<div class="dots"></div>				
+					
+					<div id="my_info">
+						<div class="user_pic left">
+							<div class="special4"></div>
+							<img alt="" src="" />										
+						</div>
+						<div class="txt">					
+							<strong><span></span></strong><br />
+							<span></span><br />						
+						</div>
+					</div>
+					
+					<div id="my_buttons">
+						<br />						
+						<div id="get_stat_div"><button data-theme="e" id="get_stat">Statistics</button></div>	
+						<div id="upload_image_div"><button data-theme="e" id="upload_image">Manage Images</button></div>											
+					</div>
+						
+				</div>
+				
+				<div class="orange_line" data-scroll="false"></div>
+				
+				
+				<div data-role="content" data-scroll="false" id="statistics">
+					<div class="stat_side">
+						<div class="items_wrap">
+							<div class="stat_title">Added You To Friends</div>
+							<div class="stat_value" onclick="app.getStatUsers('addedMeToFriends');">154</div>
+						</div>
+						<div class="items_wrap">
+							<div class="stat_title">Contacted You</div>
+							<div class="stat_value" onclick="app.getStatUsers('contactedMe');">229</div>
+						</div>
+						<div class="items_wrap">
+							<div class="stat_title">Viewed Your Profile</div>
+							<div class="stat_value" onclick="app.getStatUsers('lookedMe');">2</div>
+						</div>
+					</div>
+					<div class="stat_side">
+						<div class="items_wrap">
+							<div class="stat_title">Added To Friends</div>
+							<div class="stat_value" onclick="app.getStatUsers('friends');">55</div>
+						</div>
+						<div class="items_wrap">
+							<div class="stat_title">Added To Black List</div>
+							<div class="stat_value" onclick="app.getStatUsers('blackList');">118</div>
+						</div>
+						<div class="items_wrap">
+							<div class="stat_title">Contacted</div>
+							<div class="stat_value" onclick="app.getStatUsers('contactedThem');">3</div>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+				
+				<div id="uploadDiv">
+				
+					
+				
+				
+					<div class="grey_line_wrap" data-scroll="false">
+						<div class="grey_line"></div>
+					</div>
+					<div data-role="content" data-scroll="false">
+					
+						<button data-theme="e" onclick="app.capturePhoto(app.pictureSource.CAMERA, app.destinationType.FILE_URI);">Take A Photo</button>
+						<button data-theme="e" onclick="app.capturePhoto(app.pictureSource.PHOTOLIBRARY, app.destinationType.FILE_URI);">Choose From Library</button>
+						<button data-theme="e" onclick="app.displayUserImages();">My Images</button>
+
+						<br />
+						
+						<!-- <img src="images/welcome.jpg" alt="" id="myNewPhoto" />  -->
+					
+					
+					<!-- 
+					<script>
+					$(document).ready(
+						function(){			
+							$('#myNewPhoto').Jcrop({
+								onChange: showPreview,
+								onSelect: showPreview,
+								aspectRatio: 1
+							});   	
+						}
+					);
+					
+					
+					function showPreview(coords)
+					{
+						var rx = 100 / coords.w;
+						var ry = 100 / coords.h;
+
+						$('#preview').css({
+							width: Math.round(rx * 500) + 'px',
+							height: Math.round(ry * 370) + 'px',
+							marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+							marginTop: '-' + Math.round(ry * coords.y) + 'px'
+						});
+					}
+					
+					</script>
+					-->
+					
+					
+					
+					
+					
+					</div>
+					
+					<br /><br />
+					
+					
+					
+				</div>
+			</div>
+		
+		</div> 
+		
+		<!--End My Profile Page -->
+		
+		
+		<!--Start Search From Page -->
+		<div id="search_form_page"  class="appPage">
+			<div data-role="content" data-scroll="false">
+				<div class="content_wrap">
+								
+				<h1>Search</h1>
+				<div class="dots"></div>
+				<form action="" method="post" id="searchForm" name="searchForm">	    			
+					<div class="sf_txt">Country:</div>				
+					<div class="sf_sel_wrap">
+						<select name="country" id="countries_list">
+							<option value="">Choose Country</option>													
+						</select>
+					</div>
+					
+					<div id="regions_wrap">
+						<div class="sf_txt">State:</div>				
+						<div class="sf_sel_wrap regionsList">
+						
+						</div>					
+					</div>
+					
+					<div id="test"></div>					
+					
+					<div class="sf_txt">Age:</div>				
+					<div class="sf_sel_wrap">
+						<div class="sf_sel_wrap2 age_1">
+									
+						</div>					
+						
+						<div class="sf_txt2"> to </div>
+											
+						<div class="sf_sel_wrap2 age_2">
+							
+						</div>
+					</div>
+					
+					<div class="sf_txt">Disability:</div>				
+					<div class="sf_sel_wrap">
+						<select name="healthId" id="health_list">
+							
+													
+						</select>
+					</div>   
+					
+					<div class="sf_txt">Nickname:</div>				
+					<div class="sf_sel_wrap">
+						<input type="text" class="nickName" value="" />
+					</div>	  			
+					
+					<div id="right_buttons">
+						<!-- <div id="search" class="search_but" onclick="app.search();"></div>  -->				
+						<input type="button" data-theme="e" value="Search" onclick="app.search();">
+					</div>
+									
+					<!-- 
+					<div id="right_buttons">
+						<div id="my_search" class="search_but"></div>
+					</div>				
+					 -->
+					
+				
+				</form>
+							
+				
+				
+				
+					
+				</div>					
+			</div>
+		
+		</div>
+		<!--End Search From Page -->
+		
+		
+		
+		
+		<!--Start Search From Page -->
+		<div id="user_profile_page"  class="appPage">
+			<div data-role="content">
+				<div class="content_wrap">
+		
+		
+					<h1>Extended Profile <span></span></h1>
+					<div class="dots"></div>
+					
+					<div id="user_profile">
+						<div id="user_pictures">
+												
+							
+							<div class="pic_wrap left"><!-- class="<?if(empty($this->vars['pic_2']) and empty($this->vars['pic_3']) ):?>pic_wrap_center<?else:?>pic_wrap<?endif;?>" -->
+								
+								 
+								
+								<a href="#" class="fancybox" rel="images">
+									<img src="" alt="" id="pic1" />
+								</a>
+								
+								
+								 
+								<div class="gal_top_icons">				
+										
+									<div class="special3 left"></div>
+															
+									<div class="blue_star left"></div>						
+								</div>
+								
+								<div class="on5"></div>
+								
+								
+								
+														
+							</div>
+							
+							
+							
+							<div class="pic_wrap">
+								<a href="#" class="fancybox" rel=""><img src="" id="pic2" /></a>
+							</div>
+							   
+							
+							
+							<div class="pic_wrap">
+								<a href="#" class="fancybox" rel=""><img src="" id="pic3" /></a>
+							</div>
+							
+							
+						</div>
+						
+						<div class="clear"></div>
+						
+						
+						
+						<div id="user_details">
+						</div>
+						
+						
+						
+						
+						
+					</div>
+			
+				</div>					
+			</div>		
+		</div>					
+					
+			
+		<!--Start Messenger Page -->
+		<div id="messenger_page"  class="appPage"> 
+			<div data-role="content">
+				<div class="content_wrap">
+					<h1>Messenger</h1>
+					<div class="dots"></div>
+					<div class="chats_wrap">
+					
+					</div>			
+				</div>					
+			</div>		
+		</div>
+		<!--End Messenger Page -->		
+		
+		<!--Start Chat Page -->
+		<div id="chat_page"  class="appPage"> 
+			<div data-role="content">
+				<div class="content_wrap">
+					<h1>Chat With <span></span></h1>
+					<div class="dots"></div>
+					
+					<div class="sendMessDiv">
+						<div class="messField"><textarea id="message"></textarea></div>
+						<div class="sendMessButDiv"><button class="sendMes" data-theme="e" onclick="app.sendMessage();">Send</button></div>
+					</div>					
+					
+					<div class="clear"></div>
+					
+					<div class="chat_wrap">
+					
+					</div>			
+				</div>					
+			</div>		
+		</div>
+		<!--End Chat Page -->
+			
+		
+		<!--Start Delete Images Page -->
+		<div id="delete_images_page"  class="appPage"> 
+			<div data-role="content">
+				<div class="content_wrap">
+					<h1>My Images</h1>
+					<div class="dots"></div>
+					<div class="imagesButtonsWrap">
+						<button data-theme="e" onclick="app.capturePhoto(app.pictureSource.CAMERA, app.destinationType.FILE_URI);">Take A Photo</button>
+						<button data-theme="e" onclick="app.capturePhoto(app.pictureSource.PHOTOLIBRARY, app.destinationType.FILE_URI);">Choose From Library</button>						
+						<div class="dots"></div>
+					</div>
+					<div class="imagesListWrap"></div>
+					
+						
+				</div>					
+			</div>		
+		</div>
+		<!--End Delete Images Page -->
+		
+		<!--Start Upload Image Page -->
+		<div id="upload_image_page"  class="appPage"> 
+			<div data-role="content">
+				<div class="content_wrap">
+					<h1>Upload Image</h1>
+					<div class="dots"></div>
+					<div class="regInfo"></div>					
+					<div class="up_buttons take_a_photo" onclick="app.capturePhoto(app.pictureSource.CAMERA, app.destinationType.FILE_URI);"></div>
+					<div class="up_buttons choose_from_library" onclick="app.capturePhoto(app.pictureSource.PHOTOLIBRARY, app.destinationType.FILE_URI);"></div>		
+					<div class="up_buttons continue" onclick="app.chooseMainPage();"></div>
+				</div>					
+			</div> 	
+		</div>
+		<!--End Upload Image Page -->
+		
+		
+		<!--Start Register Page -->
+		<div id="register_page"  class="appPage"> 
+			<div data-role="content">
+				<div class="content_wrap">
+					<h1>Registration</h1>
+					<div class="dots"></div>
+					<div class="regFormWrap">
+					
+					
+					<form id="regForm" data-role="none" onsubmit="return false;">
+						<div class="regTxt lineHeight_50">E-mail</div><div class="regInput"><input type="text" name="userEmail" id="userEmail" data-role="none" maxlength="50" /></div>
+						<div class="clear"></div>
+						<div class="regTxt mar_top_8">Retype Email</div><div class="regInput"><input type="text" id="userEmail2" name="userEmail2" data-role="none" maxlength="50" /></div>
+						<div class="clear"></div>
+						<div class="regTxt lineHeight_50">Password</div><div class="regInput"><input type="password" name="userPass" id="userPass" maxlength="50" data-role="none" /></div>
+						<div class="clear"></div>
+						<div class="regTxt mar_top_8">Retype Password</div><div class="regInput"><input type="password" name="userPass2" id="userPass2" maxlength="50" data-role="none" /></div>
+						<div class="clear"></div>
+						
+						<div class="regTxt lineHeight_50">Username</div><div class="regInput"><input type="text" name="userNic" data-role="none" maxlength="50" /></div>
+						<div class="clear"></div>
+						
+						
+						  
+						<div class="regTxt lineHeight_50">Gender</div>
+						<div class="regInput">
+						
+						
+						
+							<fieldset data-role="controlgroup" data-type="horizontal">
+							    <input type="radio" name="userGender" id="radio-male" value="0" checked="checked">
+							    <label for="radio-male">Male</label>
+							    <input type="radio" name="userGender" id="radio-female" value="1">
+							    <label for="radio-female">Female</label>
+							</fieldset>
+						  
+						    
+						   
+						    <!-- 
+						    <div data-role="fieldcontain">
+							<select name="userGender" id="confirm" data-role="slider" data-theme="c" data-track-theme="c">
+							<option value="0">Male</option>
+							<option value="1">Female</option>
+							</select>
+							</div>
+							 -->
+						    
+						    
+						    			
+						</div>
+						<div class="clear"></div>
+						
+						<div class="bold"> Your date of birth </div>
+						<div class="clear"></div>
+						<div class="regInput">
+							<div id="birthDate" class="left">
+							
+							</div>
+						</div>
+						<div class="clear"></div>
+						
+						
+						
+						
+						
+						<div class="regTxt mar_top_8">Sexual Preference</div>
+						<div class="regInput">
+							<select name="sexPrefId" id="sex_preference_list">						
+													
+							</select>
+						</div>
+						<div class="clear"></div>
+												
+						<div class="regTxt lineHeight_50">Country</div>
+						<div class="regInput">						
+							<select name="countryCode" id="countries_list">
+								<option value="">Choose Country</option>													
+							</select>
+						</div>
+						<div class="clear"></div>
+						
+						
+						
+						<div class="regTxt lineHeight_50" id="regions_wrap">State</div>				
+						<div class="regInput regionsList">
+							
+						</div>					
+						<div class="clear"></div>
+						
+						<div class="regTxt lineHeight_50" id="cities_wrap">City</div>				
+						<div class="regInput citiesList">
+							
+						</div>					
+						<div class="clear"></div>
+						
+						<div class="regTxt lineHeight_50">Zip Code</div><div class="regInput"><input type="text" name="zipCode" data-role="none" maxlength="50" /></div>
+						<div class="clear"></div>
+						
+						
+						<div class="regTxt mar_top_8">Country of Origin</div>
+						<div class="regInput">						
+							<select name="countryOfOriginCode" id="countries_list2">
+								<option value="">Choose Country</option>													
+							</select>
+						</div>
+						<div class="clear"></div>
+						
+												
+						<br />
+						<br />
+						<div class="bold">I confirm that I have read and agreed to the Terms and Conditions of Service of membership at Dating4disabled.com.</div>
+						<div class="clear"></div>
+						
+						<div data-role="fieldcontain">
+							<select name="confirm" id="confirm" data-role="slider" data-theme="c" data-track-theme="c">
+							<option value="0">No</option>
+							<option value="1">Yes</option>
+							</select>
+						</div>
+						
+						
+						<br />
+						
+						<!-- <label><input type="checkbox" name="remember_me" value="remember_me"  /> <span>remember me</span> </label>  -->															
+							
+					</form>
+					
+					
+					
+						<button data-theme="e" onclick="app.sendRegData();">Send</button>  
+					
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					
+					</div>
+				</div>					
+			</div>		
+		</div>
+		<!--End Register Page -->
+				
+		<!--Start Subsribtion Page --> 
+		<div id="subscription_page"  class="appPage">
+			<div data-role="content">
+				<div class="content_wrap">
+									
+					<div>
+						<a href="#" class="subscr_quest"><span>+</span> Why pay for a Dating4Disabled.com membership?</a>
+						<br /><br />			
+						<div class="subscr_text hidden">
+						Following years of providing all services to it's worldwide members for free, to cope with rising costs, 
+						Dating4Disabled.com now charges a reasonable monthly fee. The site has been upgraded to a new server and 
+						improved member services include having expanded our blogs and forum capabilities. 
+						Join Dating4Disabled.com as a paying member today and become a part of our outstanding international 
+						community of fine people who are serious about finding a life partner, husband, wife, and/or best friend.						
+						</div>
+					</div>
+					
+					<div>
+						<a href="#" class="subscr_quest"><span>+</span> What are the benefits of becoming a paid member of Dating4Disabled.com?</a>
+						<br /><br />			
+						<div class="subscr_text hidden">
+						Paid membership entitles you to access and read an unlimited number of member messages sent to you each month. 
+						Additionally, paying members' messages can be read by anyone that the paying member writes to.			
+						</div>
+					</div>
+					
+					<h3>To pay please choose your subscription method</h3>
+					
+					<div>
+						<div class="subscr">
+							<div class="subscr_left"><input type="radio" name="subscr" value="1" class="subscr_ch" /></div> 
+							<div class="subscr_center">1 month recurring<br />subscription</div>
+							<div class="subscr_right">$19.90</div>
+						</div>
+						
+						<div class="subscr">
+							<div class="subscr_left"><input type="radio" name="subscr" value="2" class="subscr_ch" /></div>
+							<div class="subscr_center">
+								3 months recurring<br />subscription
+								<br /> <span>($13.30 a month)</span>
+							</div>
+							<div class="subscr_right">$39.90</div>
+						</div>
+						
+						<div class="subscr">
+							<div class="subscr_left"><input type="radio" name="subscr" value="3" class="subscr_ch" /></div>
+							<div class="subscr_center">
+								6 months recurring<br />subscription
+								<br /> <span>($11.65 a month)</span>
+							</div>
+							<div class="subscr_right">$69.90</div>
+						</div>
+						
+						<div class="subscr">
+							<div class="subscr_left"><input type="radio" name="subscr" value="4" class="subscr_ch" /></div>
+							<div class="subscr_center">
+							12 months recurring<br />subscription
+							<br /> <span>($10.00 a month)</span>
+							</div>
+							<div class="subscr_right">$120.00</div> 
+						</div>
+						
+						
+					</div>
+					
+					
+					<!-- 
+					<div>
+						<button data-theme="a" id="pay">Continue</button>						
+					</div>
+					 -->
+					
+					<br />
+					
+					
+					<div>
+						<a href="#" class="subscr_quest"><span>+</span> How can the monthly membership be cancelled?</a>
+						<br /><br />			
+						<div class="subscr_text hidden">
+						To cancel the monthly membership, send us an e-mail via contact us or to merryl@dating4disabled.com stating 
+						your wish to stop paying the monthly fee. Such written requests must be received by us five or more business 
+						days before the automatic renewal date of the paid membership. Please note that paid memberships may not be 
+						cancelled by leaving a phone message.						
+						</div>
+					</div>
+					
+					<div>
+						<a href="#" class="subscr_quest"><span>+</span> If I am not a paying member, can I still use services of Dating4Disabled.com?</a>
+						<br /><br />			
+						<div class="subscr_text hidden">
+						Yes! All site members can use site services for free. You can post to forums and blogs and send messages to all site members. 
+						Additionally, Dating4Disabled.com provides 1(one) free gift point each month to each non-paying site member. 
+						The gift point allows the non paying member to read one message each month for free. Note that the free gift point is given to 
+						non-paying members on the 1st of the month and must be used within that month. Free Points may not be accumulated			
+						</div>
+					</div>
+					
+				</div>					
+			</div>
+		</div>
+		<!--End Subsribtion Page -->
+		
+	
+	
+	</div>
+	
+	
+	
+	
+	<div class="appTemplates">
+	
+	
+		<!-- START User Data Template -->	 
+			<div id="userDataTemplate">	
+				<div class="user_data">					
+						<div class="user_photo_wrap">
+							<img class="left user_pic" alt="" src="[IMAGE]" />
+						</div>
+						<div class="left user_short_txt">
+							<strong>							
+								[USERNICK], <span>[AGE]</span></strong><br />						
+								<span>[COUNTRY] [CITY]</span><br />					
+								[ABOUT]							
+						</div>				
+					
+					
+					<div class="left send_mes" onclick="app.getChat([USER_ID],'[USERNICK]');"></div>
+										
+					<div class="on2"></div>
+					
+					<a href="" data-transition="slide">
+						<div class="gal_top_icons">				
+							<!-- Is Paying -->		
+							<div class="special3 left"></div>
+							<!-- Is New -->							
+							<div class="blue_star left"></div>
+													
+						</div>
+					</a>					
+					<div class="distance_value"></div>				
+				</div>
+	
+			</div>
+			<!-- END User Data Template -->
+			
+			
+			<!-- START User Profile Buttons Template -->
+			<div id="userProfileButtonsTemplate">
+				<button onclick="app.getChat([USER_ID],'[USERNICK]');" data-theme="e">Send Message</button>	  					
+				<div class="clear"></div>
+				<br />
+			</div>
+			<!-- END User Profile Buttons Template -->
+			
+			
+			<!-- START User Profile Group Template -->
+			<div id="userProfileGroupTemplate">
+				<div class="user_data_group bold">[GROUP_NAME]</div>
+			</div>
+			<!-- END User Profile Group Template -->
+			
+			
+			<!-- START User Profile Line Template -->
+			<div id="userProfileLineTemplate">
+				<div class="user_data_wrap">
+					<div class="user_data bold">[LINE_NAME]</div>
+					<div class="user_data">[LINE_VALUE]</div>
+					<div class="underline"></div>
+				</div>
+			</div>
+			<!-- END User Profile Line Template -->
+			
+			
+			<!-- START Messenger Template -->
+			<div id="messengerTemplate">
+				<div class="mail_section" onclick="app.getChat([USER_ID],'[USERNICK]');">					
+					<div class="txt">
+						<strong>[USERNICK]</strong><br />
+						[RECENT_MESSAGE]					
+					</div>					
+					<img src="[IMAGE]" />
+					<span>[DATE]</span>					
+					<div class="special2 hidden"></div>
+					<div class="new_mes_count"></div>					 
+				</div>
+			</div>
+			<!-- END Messenger Template -->
+			
+			<!-- START Chat Message Template -->
+			<div id="chatMessageTemplate">
+				<div class="[MESSAGE_TYPE] [MESSAGE_FLOAT]">[MESSAGE]</div>
+				<div class="message_info [INFO]">sent: [DATE] time: [TIME]</div>
+			</div>
+			<!-- END Chat Message Template -->
+			
+			<!-- START Images List Template -->
+			<div id="editImageTemplate">				
+				<div class="userImageWrap">
+					<img src="[IMAGE]" width="295" /><br />
+					<span class="imageStatus"></span>
+					<button onclick="app.confirmDeleteImage([IMAGE_ID]);" data-theme="e">Delete</button>
+					<br /><br /><br />
+				</div>
+			</div>
+			<!-- END Images List Template -->
+			
+	
+	</div>
+	
+	
+	
+	
+	
+		
+	</body>
+</html>
