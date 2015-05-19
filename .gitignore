@@ -1,6 +1,7 @@
 plugins/*
 res/*
 spec/*
+img/*
 spec.html
 cordova.js
 cordova_plugins.js

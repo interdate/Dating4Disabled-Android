@@ -1,3 +1,9 @@
+window.onerror = function(message, url, lineNumber) {
+	//console.log("Error: "+message+" in "+url+" at line "+lineNumber);
+	alert("Error: "+message+" in "+url+" at line "+lineNumber);
+
+}
+
 
 pagesTracker = [];
 pagesTracker.push('main_page');
@@ -47,14 +53,16 @@ var app = {
 	newMessagesCount : 0,
 	
 		
-	init: function(){		
-		//navigator.splashscreen.show(); 		
+	init: function(){
+
+		//navigator.splashscreen.show();
+		app.pictureSource = navigator.camera.PictureSourceType;
+        app.destinationType = navigator.camera.DestinationType;
+        app.encodingType = navigator.camera.EncodingType;
+
 		app.ajaxSetup();		
 		app.chooseMainPage();
-		
-		app.pictureSource = navigator.camera.PictureSourceType;
-		app.destinationType = navigator.camera.DestinationType;
-		app.encodingType = navigator.camera.EncodingType;		
+
 	},
 
 	ajaxSetup: function(){
@@ -66,8 +74,7 @@ var app = {
 			user = 'nouser';
 			pass = 'nopass';
 		}
-		
-		
+
 		$.ajaxSetup({			
 			dataType: 'json',
 			type: 'Get',
@@ -183,22 +190,24 @@ var app = {
 	},
 	
 	chooseMainPage: function(){
-		
+
 		pagesTracker = [];
-		pagesTracker.push('main_page');		
+		pagesTracker.push('main_page');
 						
 		$.ajax({ 
 			url: 'http://m.dating4disabled.com/api/v2/user/login',
-			error: function(response){				
-				//alert(JSON.stringify(response));
+			error: function(response){
+				alert(JSON.stringify(response));
 			},
 			statusCode:{
 				401: function(response, status, xhr){
 					app.logged = false;
 					app.UIHandler();
+					alert(JSON.stringify(response));
 				}
 			},
-			success: function(data, status){ 
+			success: function(data, status){
+				alert(JSON.stringify(data));
 				if(data.userId > 0){					
 					app.logged = true;
 					window.localStorage.setItem("userId", data.userId);					
