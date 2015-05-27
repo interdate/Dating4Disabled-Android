@@ -1,6 +1,6 @@
 window.onerror = function(message, url, lineNumber) {
 	//console.log("Error: "+message+" in "+url+" at line "+lineNumber);
-	alert("Error: "+message+" in "+url+" at line "+lineNumber);
+	//alert("Error: "+message+" in "+url+" at line "+lineNumber);
 
 }
 
@@ -8,6 +8,11 @@ window.onerror = function(message, url, lineNumber) {
 pagesTracker = [];
 pagesTracker.push('main_page');
 var pushNotification;
+getUsersRequest = '';
+checkNewMessagesRequest = '';
+newMessages = '';
+
+
 
 
 var app = { 
@@ -46,6 +51,7 @@ var app = {
 	profileLineTemplate : '',
 	
 	userId : '',
+	reportAbuseUserId : '',
 	gcmDeviceId : '',
 	imageId : '',
 	positionSaved : false,
@@ -60,7 +66,8 @@ var app = {
         app.destinationType = navigator.camera.DestinationType;
         app.encodingType = navigator.camera.EncodingType;
 
-		app.ajaxSetup();		
+
+		app.ajaxSetup();
 		app.chooseMainPage();
 
 	},
@@ -91,15 +98,8 @@ var app = {
 					app.showPage('login_page');
 					document.removeEventListener("backbutton", app.back, false);
 					//app.printUsers();
-					
-					
-					navigator.notification.alert(
-						'You entered incorrect data, please try again',
-						//response.status + ':' + textStatus,	
-						'Notification',
-						'Notification'
-					);
-					 
+
+					app.alert('You entered incorrect data, please try again');
 				}
 		
 			},
@@ -114,13 +114,33 @@ var app = {
 			},
 		});		
 	},
+
+	alert: function(message){
+    	navigator.notification.alert(
+    		message,
+    		function(){},
+    		'Notification',
+    		'Ok'
+    	);
+    },
 	
 	logout:function(){
 		
+		$(window).unbind('scroll');
+		clearTimeout(newMessages);
 		app.startLoading();
-		//clearTimeout(newMesssages);
 		pagesTracker = [];
 		pagesTracker.push('login_page');
+
+		if(checkNewMessagesRequest != ''){
+        	checkNewMessagesRequest.abort();
+        	console.log("Abort checkNewMessagesRequest");
+       	}
+
+        if(getUsersRequest != ''){
+        	getUsersRequest.abort();
+        	console.log("Abort getUsersRequest");
+        }
 		
 		$.ajax({				
 			url: 'http://m.dating4disabled.com/api/v2/user/logout',			
@@ -193,21 +213,23 @@ var app = {
 
 		pagesTracker = [];
 		pagesTracker.push('main_page');
+
+		app.startLoading();
 						
 		$.ajax({ 
 			url: 'http://m.dating4disabled.com/api/v2/user/login',
 			error: function(response){
-				alert(JSON.stringify(response));
+				//alert(JSON.stringify(response));
 			},
 			statusCode:{
 				401: function(response, status, xhr){
 					app.logged = false;
 					app.UIHandler();
-					alert(JSON.stringify(response));
+					//alert(JSON.stringify(response));
 				}
 			},
 			success: function(data, status){
-				alert(JSON.stringify(data));
+				//alert(JSON.stringify(data));
 				if(data.userId > 0){					
 					app.logged = true;
 					window.localStorage.setItem("userId", data.userId);					
@@ -460,6 +482,11 @@ var app = {
 			window.scrollTo(0, app.recentScrollPos);
 			app.setScrollEventHandler();
 		}
+		else{
+			var usersListPage = pagesTracker[pagesTracker.length-2];
+        	if(usersListPage != 'users_list_page')
+        		app.searchFuncsMainCall = true;
+        }
 		
 		app.searchFuncsMainCall = true;
 		app.stopLoading();
@@ -599,14 +626,16 @@ var app = {
 			var ageTo = $(".age_2 select").val();
 			var disabilityId = $('#health_list').val();	
 			var nickName = $('.nickName').val();
+			var gender = $('#gender').val();
 			//alert(nickName);
-			app.requestUrl = 'http://m.dating4disabled.com/api/v2/users/search/country:'+countryCode+'/region:'+regionCode+'/age:'+ageFrom+'-'+ageTo+'/disability:'+disabilityId+'/nickName:'+nickName+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
+			app.requestUrl = 'http://m.dating4disabled.com/api/v2/users/search/gender:'+gender+'/country:'+countryCode+'/region:'+regionCode+'/age:'+ageFrom+'-'+ageTo+'/disability:'+disabilityId+'/nickName:'+nickName+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
+			//app.requestUrl = 'http://m.dating4disabled.com/api/v2/users/search/gender:'+gender+'/country:'+countryCode+'/region:'+regionCode+'/age:'+ageFrom+'-'+ageTo+'/disability:'+disabilityId+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
 		}	
 		else if(app.action == 'getStatResults'){					
 			app.requestUrl = 'http://m.dating4disabled.com/api/v2/user/statistics/'+app.statAction+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
 		}
 		
-		$.ajax({						
+		getUsersRequest = $.ajax({
 			url: app.requestUrl,
 			timeout:10000,
 			//error:function(response){
@@ -726,7 +755,9 @@ var app = {
 			app.capturePhoto(app.pictureSource.PHOTOLIBRARY, app.destinationType.FILE_URI);
 		});
 		*/
-		
+		app.showPage('my_profile_page');
+        app.container = app.currentPageWrapper.find('.myProfileWrap');
+		app.container.find(".special4").hide();
 		
 		
 		var userId = window.localStorage.getItem("userId");
@@ -741,9 +772,9 @@ var app = {
 				app.container.find('.txt strong').html(user.nickName+', <span>'+user.age+'</span>');			
 				app.container.find('.txt strong').siblings('span').text(user.country+', '+user.city); 
 				app.container.find('.txt').append(user.about);			
-				app.container.find('.user_pic img').attr("src",user.mainImage);
+				app.container.find('.user_pic img').attr("src",user.mainImage.url);
 				
-				if(user.isPaying){
+				if(user.isPaying == 1){
 					app.container.find(".special4").show();
 				}				
 				
@@ -777,7 +808,8 @@ var app = {
 		app.getUsers();
 	},
 	
-	getSearchForm: function(){				
+	getSearchForm: function(){
+		//$('#search_form_page').find('#gender').css({"disabled":"disabled"});
 		app.startLoading();
 		app.showPage('search_form_page');
 		$("#regions_wrap").hide();
@@ -811,19 +843,42 @@ var app = {
 	},
 	
 	getDisabilities: function(){
-		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v2/list/health',						
-			success: function(list, status, xhr){							
-				var html = '<option value="">All</option>'; 
-				for(var i in list.items){					  
-					var item = list.items[i];					
-					html = html + '<option value="' + item.healthId + '">' + item.healthName + '</option>';
-				}
-				$("#health_list").html(html);
-				$("#health_list").val($("#health_list").val()).selectmenu("refresh");
-			}
-		});
-	},
+
+    	$.ajax({
+    		url: 'http://m.dating4disabled.com/api/v2/list/health',
+    		success: function(list, status, xhr){
+    			var html = (app.currentPageId == 'register_page') ? '' : '<option value="">All</option>';
+    			for(var i in list.items){
+    				var item = list.items[i];
+    				html = html + '<option value="' + item.healthId + '">' + item.healthName + '</option>';
+    			}
+
+    		   var disability = app.container.find("#health_list");
+    		   disability.html(html);
+    		   disability.val(disability.val()).selectmenu("refresh");
+    		}
+    	});
+    },
+
+
+    getMobility: function(){
+
+    	$.ajax({
+    	   url: 'http://m.dating4disabled.com/api/v2/list/mobility',
+    	   success: function(list, status, xhr){
+    	       var html = (app.currentPageId == 'register_page') ? '' : '<option value="">All</option>';
+    	       for(var i in list.items){
+    		       var item = list.items[i];
+    	           html = html + '<option value="' + item.mobilityId + '">' + item.mobilityName + '</option>';
+    	       }
+
+    		   var mobility = app.container.find("#mobility_list");
+        	   mobility.html(html);
+    	       mobility.val(mobility.val()).selectmenu("refresh");
+    	   }
+        });
+    },
+
 	
 	getSexPreference: function(){
 		$.ajax({			
@@ -975,11 +1030,7 @@ var app = {
 						app.getRegStep();
 					}
 					else{
-						navigator.notification.alert(
-							app.response.err,								
-							'Notification',
-							'Notification'
-						);
+						app.alert(app.response.err);
 					}    
 				}
 			});
@@ -998,48 +1049,73 @@ var app = {
 	},
 	
 	formIsValid: function(){
-		
-		var email_pattern = new RegExp(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);		
-		
-		
-		if (!(email_pattern.test($('#userEmail').val()))) {
-			alert("Invalid e-mail");
-			$('#userEmail').focus();
-			return false;
-		}
-		
-		if ($('#userEmail').val() != $('#userEmail2').val()) {
-			alert("Error in retyped email");
-			$('#userEmail2').focus();
-			return false;
-		}
-		
-		if ($('#userPass').val().length < 4 || $('#userPass').val().length > 12) {
-			alert("Invalid password (must be 4 to 12 characters)");
-			$('#userPass').focus();
-			return false;
-		}
-		
-		if ($('#userPass').val() != $('#userPass2').val()) {
-			alert("Error in retyped password");
-			$('#userPass2').focus();
-			return false;
-		}
-		
-		if($('#d').val().length == 0 || $('#m').val().length == 0 || $('#y').val().length == 0){
-			alert('Invalid date of birth');
-			return false;
-		}
-		
-		
-		if($('#confirm option:selected').val() != "1"){
-			alert('Please check confirmation box');
-			return false;
-		}
-		
-		
-		return true;
-	},
+    		//return true;
+    	var email_pattern = new RegExp(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+
+
+    	if (!(email_pattern.test(app.container.find('#userEmail').val()))) {
+    		app.alert("Invalid e-mail");
+    		//$('#userEmail').focus();
+    		return false;
+    	}
+
+    	if (app.container.find('#userEmail').val() != app.container.find('#userEmail2').val()) {
+    		app.alert("Error in retyped email");
+    		//$('#userEmail2').focus();
+    		return false;
+    	}
+
+    	if (app.container.find('#userPass').val().length < 4 || app.container.find('#userPass').val().length > 12) {
+    		app.alert("Invalid password (must be 4 to 12 characters)");
+    		//$('#userPass').focus();
+    		return false;
+    	}
+
+    	if ($('#userNic').val().length < 3) {
+    		app.alert("Invalid username (must be at least 3 characters)");
+    		//$('#userNic').focus();
+    		return false;
+    	}
+
+    	if (app.container.find('#userPass').val() != app.container.find('#userPass2').val()) {
+    		app.alert("Error in retyped password");
+    		//$('#userPass2').focus();
+    		return false;
+    	}
+
+    	if(app.container.find('#d').val().length == 0 || app.container.find('#m').val().length == 0 || app.container.find('#y').val().length == 0){
+    		app.alert('Invalid date of birth');
+    		return false;
+    	}
+
+    	if(app.container.find('#cityName').val().length < 3){
+    		app.alert('Invalid city (must be at least 3 characters)');
+    		return false;
+    	}
+
+    	if(app.container.find('#zipCode').val().length < 3){
+    		app.alert('Invalid zip code');
+    		return false;
+    	}
+
+    	if(app.container.find('#aboutMe').val().length < 10){
+    		app.alert('Invalid About Me (must be at least 10 characters)');
+    		return false;
+    	}
+
+    	if(app.container.find('#lookingFor').val().length < 10){
+    		app.alert('Invalid Looking For (must be at least 10 characters)');
+    		return false;
+    	}
+
+    	if(app.container.find('#confirm option:selected').val() != "1"){
+    		app.alert('Please check confirmation box');
+    		return false;
+    	}
+
+
+    	return true;
+    },
 	
 	search: function(pageNumber){
 		app.showPage('users_list_page');		
@@ -1050,18 +1126,78 @@ var app = {
 		app.action = 'getSearchResults';
 		app.getUsers();
 	},
-	
+
+	reportAbuse: function(){
+
+    	var abuseMessage = $('#abuseMessage').val();
+
+    	$.ajax({
+    		url: 'http://m.dating4disabled.com/api/v2/user/abuse/'+app.reportAbuseUserId,
+    		type: 'Post',
+    		contentType: "application/json; charset=utf-8",
+    		data: JSON.stringify({
+    			abuseMessage: abuseMessage
+    		}),
+    		success: function(response, status, xhr){
+    		   $('#abuseMessage').val('');
+    		   app.alert('Thank you. The message has been sent');
+    		   app.back();
+    		}
+    	});
+    },
+
+    sendMessageToAdmin: function(){
+
+       	var userId = window.localStorage.getItem("userId");
+       	var messageToAdmin = $('#messageToAdmin').val();
+
+       	if(!messageToAdmin.length){
+       		return;
+       	}
+
+       	$.ajax({
+       		url: 'http://m.dating4disabled.com/api/v2/contactUs',
+       		type: 'Post',
+       		contentType: "application/json; charset=utf-8",
+       		data: JSON.stringify({
+       			userId: userId,
+       			messageToAdmin: messageToAdmin,
+       		}),
+       		error: function(error){
+       			alert(JSON.stringify(error));
+       		},
+       		success: function(response, status, xhr){
+       		   $('#messageToAdmin').val('');
+       		   app.alert('Thank you. The message has been sent');
+       		   app.back();
+       		}
+       	});
+    },
+
+
+
 	getUserProfile: function(userId){		
 		
-		app.ajaxSetup();
-		app.startLoading();
+		if(getUsersRequest != ''){
+        	getUsersRequest.abort();
+        	console.log("Abort getUsersRequest");
+        	app.pageNumber--;
+        }
+
+        if(userId==window.localStorage.getItem("userId")){app.getMyProfileData(); return;}
+        app.ajaxSetup();
+        app.startLoading();
+		app.reportAbuseUserId = userId;
 				
 		$.ajax({
 			url: 'http://m.dating4disabled.com/api/v2/user/profile/'+userId,
 			type: 'Get',
 			success: function(user, status, xhr){
 				//alert(user.userId);
+				$('.my-gallery').html('');
+
 				app.showPage('user_profile_page');
+
 				window.scrollTo(0, 0);
 				
 				var userId = window.localStorage.getItem("userId");
@@ -1070,22 +1206,40 @@ var app = {
 				
 				app.container.find('#pic1, #pic2, #pic3').attr("src","");
 				app.container.find(".special3, .blue_star, .on5, .pic_wrap").hide();
-				app.container.find('.pic_wrap').addClass("left").removeClass("center");
-				
-				app.container.find('#pic1').parent('a').addClass("fancybox");
+
+				//app.container.find('.pic_wrap').addClass("left").removeClass("center");
+				//app.container.find('#pic1').parent('a').addClass("fancybox");
+
 				app.container.find("h1 span").text(user.nickName);
 				app.container.find('#pic1').attr("src",user.mainImage).parent('a').attr({"href":user.mainImage, "rel":"images_"+user.userId});
 								
-				if(user.mainImage == "http://m.dating4disabled.com/images/no_photo_female.jpg" 
+				/*
+				if(user.mainImage == "http://m.dating4disabled.com/images/no_photo_female.jpg"
 				|| user.mainImage == "http://m.dating4disabled.com/images/no_photo_male.jpg"){
 					app.container.find('#pic1').parent('a').removeClass("fancybox").attr("href","#");
 				}
+				*/
 				
-				app.container.find('.pic_wrap').eq(0).show();				
-				app.container.find('.fancybox').fancybox();
-				
-				//alert(user.otherImages[0]);  
-				//return;
+				//app.container.find('.pic_wrap').eq(0).show();
+
+				//alert(JSON.stringify(user));
+
+				if(user.mainImage.size.length){
+					$('.noPicture').hide();
+					var userPhotoTemplate = $('#userPhotoTemplate').html().replace(/\[ID\]/g,'pic1');
+					$(userPhotoTemplate).appendTo('.my-gallery');
+					app.container.find('#pic1').attr("src",user.mainImage.url).parent('a').attr({"href":user.mainImage.url, "data-size": user.mainImage.size});
+					app.container.find('.pic_wrap').eq(0).show();
+				}
+				else{
+					$('.noPicture img').attr("src",user.mainImage.url);
+					$('.noPicture').show();
+                }
+
+
+
+
+				/*
 				
 				if(typeof user.otherImages[0] !== "undefined"){ 
 					//alert(user.otherImages[0]);
@@ -1104,7 +1258,21 @@ var app = {
 						.find("img").attr("src",user.otherImages[1])
 						.parent('a').attr({"href":user.otherImages[1], "rel":"images_"+user.userId});
 				}
-								
+				*/
+
+				if(typeof user.otherImages[0] !== "undefined"){
+					app.proccessUserPhotoHtml(user,1);
+				}else{
+					app.container.find('.pic_wrap').addClass("center");
+                }
+
+				if(typeof user.otherImages[1] !== "undefined"){
+					app.proccessUserPhotoHtml(user,2);
+				}
+
+				initPhotoSwipeFromDOM('.my-gallery');
+
+
 				if(user.isPaying == 1){
 					app.container.find(".special3").show();
 				}
@@ -1122,11 +1290,13 @@ var app = {
 								
 				if(user.userId != userId){
 					var profileButtonsTemplate = $('#userProfileButtonsTemplate').html();
+					var profileButtonsTemplate_2 = $('#userProfileButtonsTemplate_2').html();
 					profileButtonsTemplate = profileButtonsTemplate.replace(/\[USERNICK\]/g,user.nickName);									
 					profileButtonsTemplate = profileButtonsTemplate.replace("[USER_ID]", user.userId);
 				}
 				else{					
-					profileButtonsTemplate = '';
+					var profileButtonsTemplate = '';
+					var profileButtonsTemplate_2 = '';
 				}
 				
 				
@@ -1163,14 +1333,36 @@ var app = {
 				html = html + app.getProfileLine("Smoking Habits", user.smoking);				
 				html = html + app.getProfileGroup("Disability Information");				
 				html = html + app.getProfileLine("My Life Challenge", user.disability);
-				html = html + app.getProfileLine("Mobility", user.mobility);			
-				
+				html = html + app.getProfileLine("Mobility", user.mobility);
+				html = html + profileButtonsTemplate + profileButtonsTemplate_2;
+
 				detailsContainer.html(html).trigger('create');
 				
 				app.stopLoading();				
 			}
 		});
 	},
+
+	proccessUserPhotoHtml: function(user,index){
+
+    	var userPhotoTemplate = $('#userPhotoTemplate').html().replace(/\[ID\]/g,'pic' + index + 1);
+    	$(userPhotoTemplate).appendTo('.my-gallery');
+
+    	var imageSize = (user.otherImages[index-1].size.length) ? user.otherImages[index-1].size : '1x1' ;
+
+    	console.log("SIZE of " + user.otherImages[index-1].url + ":" + imageSize);
+
+    	app.container
+    		.find('.pic_wrap')
+    		.css({"float": "left"})
+    		.eq(index)
+    		.show()
+    		.find('img')
+    		.show()
+    		.attr("src",user.otherImages[index-1].url)
+    		.parent('a')
+    		.attr({"href": user.otherImages[index-1].url, "data-size": imageSize});
+    },
 	
 	
 	getProfileGroup: function(groupName){
@@ -1235,7 +1427,7 @@ var app = {
 				app.container = app.currentPageWrapper.find('.chat_wrap');
 				app.container.html('');
 				app.template = $('#chatMessageTemplate').html();				
-				app.currentPageWrapper.find('.content_wrap').find("h1 span").text(userNick);
+				app.currentPageWrapper.find('.content_wrap').find("h1 span").text(userNick).attr("onclick", "app.getUserProfile('"+app.chatWith+"');")
 				var html = app.buildChat();
 				app.container.html(html);
 				app.refreshChat();
@@ -1325,24 +1517,32 @@ var app = {
 				url: 'http://m.dating4disabled.com/api/v2/user/chat/'+app.chatWith+'/refresh',
 				type: 'Get',			
 				success: function(response){
-					app.response = response;
-					if(app.response.chat != false){				
-						var html = app.buildChat();
-						app.container.html(html);						
+					if(app.currentPageId == 'chat_page'){
+						app.response = response;
+						if(app.response.chat != false){
+							if(app.currentPageId == 'chat_page'){
+								var html = app.buildChat();
+								if(app.currentPageId == 'chat_page'){
+									app.container.html(html);
+								}
+							}
+						}
+						//else alert(app.response.chat);
+						refresh = setTimeout(app.refreshChat, 100);
 					}
-					//else alert(app.response.chat);
-					
-					setTimeout(app.refreshChat, 100);
 				}
 			});
 		}
+		else{
+        	clearTimeout(refresh);
+        }
 		
 	},
 	
 	checkNewMessages: function(){
 		
-		if(app.currentPageId != 'login_page'){
-			$.ajax({
+		if(app.currentPageId != 'login_page' && app.currentPageId != 'register_page' && app.currentPageId != 'forgot_password_page'){
+			checkNewMessagesRequest = $.ajax({
 				url: 'http://m.dating4disabled.com/api/v2/user/newMessagesCount',
 				type: 'Get',
 				complete: function(response, status, jqXHR){
@@ -1353,7 +1553,7 @@ var app = {
 					//alert(app.response.newMessagesCount);
 					if(app.response.newMessagesCount > 0){
 						app.newMessagesCount = app.response.newMessagesCount;
-						if(app.currentPageId != 'login_page' && app.currentPageId != 'main_page'){														
+						if(app.currentPageId != 'login_page' && app.currentPageId != 'main_page' && app.currentPageId != 'register_page' && app.currentPageId != 'forgot_password_page'){
 							$('.new_mes_count2').html(app.newMessagesCount);
 							//$(".new_mes").show();
 						}
@@ -1367,8 +1567,9 @@ var app = {
 					else{
 						app.newMessagesCount = 0;
 						$('.new_mes').hide();
+						$('#new_mes_count').hide();
 					}
-					newMesssages = setTimeout(app.checkNewMessages, 10000);
+					newMessages = setTimeout(app.checkNewMessages, 10000);
 				}
 			});
 		}
@@ -1446,7 +1647,7 @@ var app = {
 			url: app.requestUrl,
 			type: app.requestMethod,			
 			success: function(response){
-				alert(JSON.stringify(response));				
+				//alert(JSON.stringify(response));
 				app.response = response;
 				app.showPage('delete_images_page');
 				app.container = app.currentPageWrapper.find('.imagesListWrap');
@@ -1545,12 +1746,7 @@ var app = {
 		        'Manage Images,Cancel'          // buttonLabels
 		    );
 		}else if(app.response.status.code == 1){
-			navigator.notification.alert(
-				app.response.status.message,  // message
-		        function(){},         // callback
-		        'Notification',            // title
-		        'Ok'                  // buttonName
-		    );			
+			app.alert(app.response.status.message);
 		}
 		
 		if(app.currentPageId == 'delete_images_page'){
@@ -1568,13 +1764,199 @@ var app = {
 	uploadFailure: function(error){
 		 alert("An error has occurred. Please try again.");
 	},
+
+
+
+	getEditProfile: function(){
+			app.startLoading();
+
+    		$.ajax({
+    			url: 'http://m.dating4disabled.com/api/v2/user/data',
+    			success: function(response){
+    			   user = response.user;
+    			   //alert(JSON.stringify(response));
+    			   app.showPage('edit_profile_page');
+    			   app.container = app.currentPageWrapper.find('.edit_wrap');
+    			   app.container.html('');
+    			   app.template = $('#userEditProfileTemplate').html();
+    			   app.template = app.template.replace(/\[userNick\]/g,user.userNic);
+    			   app.template = app.template.replace(/\[userPass\]/g,''); //user.userPass
+    			   app.template = app.template.replace(/\[userEmail\]/g,user.userEmail);
+
+    			   app.template = app.template.replace(/\[userCity\]/g,user.userCityName);
+
+    			   if(user.userAboutMe == null)
+    					user.userAboutMe='';
+
+    			   if(user.userLookingFor == null)
+    					user.userLookingFor='';
+
+    			   app.template = app.template.replace(/\[userAboutMe\]/g,user.userAboutMe);
+    			   app.template = app.template.replace(/\[userLookingFor\]/g,user.userLookingFor);
+    			   //app.template = app.template.replace(/\[userfName\]/g,user.userfName);
+    			   //app.template = app.template.replace(/\[userlName\]/g,user.userlName);
+    			   app.template = app.template.replace(/\[Y\]/g,user.Y);
+    			   app.template = app.template.replace(/\[n\]/g,user.n);
+    			   app.template = app.template.replace(/\[j\]/g,user.j);
+
+
+    			   app.container.html(app.template).trigger('create');
+    			   app.getRegions();
+    			   $('#userBirth').html(app.getBithDate()).trigger('create');
+
+
+
+    			   //app.container.find('.userGender').html(app.getuserGender()).trigger('create');
+    			},
+    			error: function(err){
+    			   alert(JSON.stringify(err));
+    			}
+    		});
+    	},
+
+    	saveProf: function (el,tag){
+    		var name = '';
+    		var val = '';
+    		var input = $(el).parent().find(tag);
+    		if(input.size()=='3'){
+    			var er=false;
+    			input.each(function(index){
+    					   if(index!='0')val=val+'-';
+    					   val=val+$(this).val();
+    					   if($(this).val().length==0){
+    					   alert('Birthday is incorrect');
+    					   er=true;
+    					   }
+    					   });
+    			if(er)return false;
+    			name = 'userBirthday';
+    		}else{
+    			name = input.attr('name');
+    			val = input.val();
+    		}
+    		//alert(name+'='+val);//return false;
+    		if(name == 'userPass'){
+    			if(val.length < 5){
+    				alert('Password is to short');
+    				return false;
+    			}
+
+    			if($('#editedUserPass2').val() !== val){
+    				alert("Passwords don't match");
+    				return false;
+    			}
+
+    		}
+    		if((val.length < 3 && tag!='select') || (val.length==0 && tag=='select')){
+    			alert($(el).parent().parent().prev().find('span').text()+'is to short');
+    			return false;
+    		}
+    		var email_pattern = new RegExp(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+    		if (!(email_pattern.test(val))&&name=='userEmail') {
+    			alert("E-mail is incorrect");
+    			return false;
+    		}
+
+    		if($(el).parent().find('.userFailed').length > 0&&$(el).parent().find('.userFailed').is(":visible"))
+    			return false;
+    		app.startLoading();
+    		//alert(name+'='+val);
+
+
+    		console.log("Abort checkNewMessagesRequest");
+            checkNewMessagesRequest.abort();
+            clearTimeout(newMessages);
+
+
+
+    		$.ajax({
+    			   url:'http://m.dating4disabled.com/api/v2/user/data',
+    			   //dataType: 'json',
+    			   type: 'post',
+    			   data: JSON.stringify({name:name,val:val}),
+    			   contentType: "application/json; charset=utf-8",
+    			   success : function(res){
+
+
+    			   		checkNewMessagesRequest.abort();
+                        clearTimeout(newMessages);
+
+
+                        var user = app.container.find("#userNic").val();
+
+                        //alert("USERNAME: " + user);
+                        //alert("PASSWORD: " + pass);
+                        window.localStorage.setItem("user",user);
+                        if(name == 'userPass'){
+                        	var pass = app.container.find("#editedUserPass").val();
+                        	window.localStorage.setItem("pass",pass);
+                        }
+
+
+
+
+					   app.ajaxSetup();
+					   app.checkNewMessages();
+
+					   app.stopLoading();
+					   //alert(JSON.stringify(res)); return false;
+
+					   if(res.err == '1'){
+					   //check(input.attr('id'),val);
+					   alert(res.text);
+					   $(el).parent().find('.input').css({'background':'red'});
+					   }else if(res.res == '1'){
+					   //alert(val);
+					   alert('Successfully saved');
+					   if(tag=='select'&&name!='userBirthday'){
+					   val = $(el).parent().find('.ui-select span').eq(1).text();
+					   //alert(val);
+					   }
+					   //if(val=='0'&&name=='userGender')val = 'אישה';
+					   //if(val=='1'&&name=='userGender')val = 'גבר';
+
+					   if(name=='userBirthday') val=val.replace(/-/g,' / ');
+					   if(name=='userPass')
+					   $(el).parent().next().find('input').val(val);
+					   else
+					   $(el).parent().next().find('div').text(val);
+					   $('.save').hide();
+					   $('.edit').show();
+					   }
+    			   },
+    			   error: function(err){
+					   app.stopLoading();
+					   alert(JSON.stringify(err));
+					   $('.save').hide();
+					   $('.edit').show();
+    			   }
+    			   });
+    	},
+
+    	editProf: function (el){
+    		var name = $(el).attr('name');
+    		if(name=='edit'){
+    			$('.save').hide();
+    			$('.edit').show();
+    			//alert($('.sf_sel_wrap .edit').size());
+    			$(el).parent().hide().prev().show();
+    		}else{
+    			$(el).parent().hide().next('.edit').show();
+    		}
+    	},
+
+
 	
 	
 	register: function(){		
 		app.showPage('register_page');		
-		$('#birthDate').html(app.getBithDate()).trigger('create');
+		app.container.find('#birthDate').html(app.getBithDate()).trigger('create');
 		app.getCountries();
 		app.getSexPreference();
+		app.getDisabilities();
+   		app.getMobility();
+   		$(".new_mes").hide();
+
 	},
 	
 	getBithDate: function(){
@@ -1610,8 +1992,45 @@ var app = {
 		
 		return html;
 	},
+
+	resetPassword: function(){
+
+		var email_pattern = new RegExp(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+
+		userEmail = app.container.find('#userEmail').val();
+
+       	if (!(email_pattern.test(userEmail))){
+       		app.alert("Invalid e-mail");
+      		return false;
+		}
+
+
+
+		$.ajax({
+        	url: 'http://m.dating4disabled.com/api/v2/user/passwordRecovery',
+        	type: 'Post',
+        	error: function(error){
+        		alert(JSON.stringify(error));
+        	},
+        	contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+            	userEmail: userEmail
+            }),
+        	success: function(response){
+        		//alert(JSON.stringify(response));
+        		app.response = response;
+        		if(app.response.success){
+        			app.alert("Your password was reset. Please check your e-mail");
+        			app.showPage('login_page');
+        		}
+        		else{
+        			app.alert("There is no user with the e-mail you entered.");
+        		}
+        	}
+        });
+	},
 	
-	
+
 	
 	
 	dump: function(obj) {
@@ -1627,6 +2046,10 @@ var app = {
 
 
 document.addEventListener("deviceready", app.init, false);
+
+window.addEventListener('load', function() {
+	new FastClick(document.body);
+}, false);
 
 function showPreview(coords)
 {
@@ -1658,76 +2081,4 @@ $.fn.serializeObject = function()
     });
     return o;
 };
-
-//======================================================== FASTCLICK
-function FastButton(element, handler) {
-   this.element = element;
-   this.handler = handler;
-   element.addEventListener('touchstart', this, false);
-};
-FastButton.prototype.handleEvent = function(event) {
-   switch (event.type) {
-      case 'touchstart': this.onTouchStart(event); break;
-      case 'touchmove': this.onTouchMove(event); break;
-      case 'touchend': this.onClick(event); break;
-      case 'click': this.onClick(event); break;
-   }
-};
-FastButton.prototype.onTouchStart = function(event) {
-
-event.stopPropagation();
-   this.element.addEventListener('touchend', this, false);
-   document.body.addEventListener('touchmove', this, false);
-   this.startX = event.touches[0].clientX;
-   this.startY = event.touches[0].clientY;
-isMoving = false;
-};
-FastButton.prototype.onTouchMove = function(event) {
-   if(Math.abs(event.touches[0].clientX - this.startX) > 10 || Math.abs(event.touches[0].clientY - this.startY) > 10) {
-      this.reset();
-   }
-};
-FastButton.prototype.onClick = function(event) {
-   this.reset();
-   this.handler(event);
-   if(event.type == 'touchend') {
-      preventGhostClick(this.startX, this.startY);
-   }
-};
-FastButton.prototype.reset = function() {
-   this.element.removeEventListener('touchend', this, false);
-   document.body.removeEventListener('touchmove', this, false);
-};
-function preventGhostClick(x, y) {
-   coordinates.push(x, y);
-   window.setTimeout(gpop, 2500);
-};
-function gpop() {
-   coordinates.splice(0, 2);
-};
-function gonClick(event) {
-   for(var i = 0; i < coordinates.length; i += 2) {
-      var x = coordinates[i];
-      var y = coordinates[i + 1];
-      if(Math.abs(event.clientX - x) < 25 && Math.abs(event.clientY - y) < 25) {
-         event.stopPropagation();
-         event.preventDefault();
-      }
-   }
-};
-document.addEventListener('click', gonClick, true);
-var coordinates = [];
-function initFastButtons() {
-new FastButton(document.getElementById("mainContainer"), goSomewhere);
-};
-function goSomewhere() {
-var theTarget = document.elementFromPoint(this.startX, this.startY);
-if(theTarget.nodeType == 3) theTarget = theTarget.parentNode;
-
-var theEvent = document.createEvent('MouseEvents');
-theEvent.initEvent('click', true, true);
-theTarget.dispatchEvent(theEvent);
-};
-//========================================================
-
 

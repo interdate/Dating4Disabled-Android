@@ -11,12 +11,13 @@ a{
 }
 
 .page{
-	background:#f7eed8;		
+	background: url("../images/bg_page.png") repeat-x;
+	background-size: 100%;
 }
 
 
 #header{
-	background: url("../images/header_bg.png") repeat-x;
+	background: #35557d;
 	height:50px;
 	border:0px;
 	/*padding: 0 10px 0 10px;
@@ -63,10 +64,19 @@ a{
 */
 
 #logo{
-	/*float:left;*/
-	width:96px;
-	height:49px;
-	background: url("../images/logo.png") no-repeat;	
+
+	background: url("../images/logo.png") no-repeat center;
+	/*for Android*/
+    width: 110px;
+    height:49px;
+    background-size: 100%;
+
+    /*for iOS*/
+    /*
+    width:96px;
+    height:49px;
+    */
+
 	margin:0px auto 0px auto;	
 }
 
@@ -78,6 +88,7 @@ a{
 .content_wrap{
 	margin:0 auto;
 	width:300px;
+
 }
 
 #download_app_button, #cell_website_button, #regular_website_button{	
@@ -109,7 +120,7 @@ a{
 }
 
 #birthDate div{	
-	margin-right:5px;
+	margin-right:0px;
 }
 
 
@@ -122,6 +133,10 @@ a{
 	
 }
 
+#user_txt, #pass_txt{
+	color: #fff;
+}
+
 .lineHeight_50{
 	line-height:50px;
 }
@@ -131,7 +146,8 @@ a{
 	margin-top:8px;
 }
 
-#user_input input, #pass_input input, .regInput input{
+
+#user_input input, #pass_input input, .regInput input, .regInput textarea{
 	width:180px;
 	height:38px;
 	border:0px;
@@ -144,6 +160,21 @@ a{
     padding:7px;
     margin-bottom:15px;
 }
+
+#user_input, #pass_input{
+	width: 96%;
+}
+
+
+#user_input input, #pass_input input{
+	background: #fff;
+	width: 100%;
+}
+
+.regInput textarea {
+	height: 100px;
+}
+
 
 /*
 .regInput input{
@@ -158,8 +189,20 @@ a{
 	height:1px;
 }
 
+#login_page{
+	margin-top: -20px;
+	height: 600px;
+	background: url('../images/bg_page_login.jpg') no-repeat;
+	background-size: cover;
+}
+
+
 #authForm{
-	
+	background: url("../images/bg_form_login.png");
+	position: absolute;
+	top: 350px;
+	left: 0px;
+	width:100%;
 }
 
 #authForm label{
@@ -184,7 +227,7 @@ a{
 }
 
 #fog_pass a{
-	color: #494949;
+	color: #fff;
 	font-size: 12px;	
 	text-decoration:underline;
 }
@@ -333,7 +376,8 @@ a{
 	right :10px;
 	width:75px;
 	height:50px;
-	background: url("../images/logout_button.png") no-repeat left center;	
+	background: url("../images/logout_button.png") no-repeat left center 100%;
+
 	display:none;
 }
 
@@ -346,6 +390,88 @@ a{
 	margin:11px 0 0 0;		
 }
 
+
+
+
+#friends_online{
+	background:url("../images/friends_online_button.png") no-repeat;
+}
+
+
+#search_friends{
+	background:url("../images/search_friends_button.png") no-repeat;
+}
+
+#profile{
+	background:url("../images/profile_button.png") no-repeat;
+}
+
+#mail_box{
+	background:url("../images/mail_box_button.png") no-repeat;
+	position:relative;
+}
+
+
+#looked_me{
+	background:url("../images/looked_me_button.png") no-repeat;
+}
+
+#looked_them{
+	background:url("../images/looked_them_button.png") no-repeat;
+}
+
+#contacted_them{
+	background:url("../images/contacted_them_button.png") no-repeat;
+}
+
+#favorites{
+	background:url("../images/favorites_button.png") no-repeat;
+}
+
+#fav_me{
+	background:url("../images/fav_me_button.png") no-repeat;
+}
+
+#update_profile{
+	background:url("../images/update_profile_button.png") no-repeat;
+}
+
+
+#friends_online, #search_friends, #profile, #mail_box, #looked_me, #looked_them,  #contacted_them, #favorites, #fav_me, #update_profile{
+	float:left;
+	width:100px;
+	height:100px;
+	background-size: 100%;
+}
+
+
+
+
+#manage_images{
+	width:100%;
+	height:75px;
+	background:url("../images/upload_photo_button.png") no-repeat;
+	background-size: 100%;
+	margin-top: 10px;
+}
+
+#contact_us{
+	width:100%;
+    height:75px;
+    background:url("../images/contact_us_button.png") no-repeat;
+    background-size: 100%;
+}
+
+#purchase_subscr{
+	float:right;
+	width:140px;
+	height:55px;
+	background:url("../images/get_subscr_button.png") no-repeat;
+}
+
+
+
+/*
 #friends_online, #search_friends, #profile, #mail_box{
 	float:left;
 	width:149px;
@@ -372,11 +498,11 @@ a{
 #why_subscr{
 	width:290px;
 	height:60px;
-	/*background:url("../images/why_subscr_button.png") no-repeat;*/
 	float:left;
 	margin-top:10px;
 }
 
+*/
 
 #new_mes_count{
 	display:none; 
@@ -417,7 +543,8 @@ a{
 	/*float:left;*/
 	width:75px;
 	height:55px;
-	background: url("../images/back_button.png") no-repeat left top;	
+	background: url("../images/back_button.png") no-repeat left top;
+	background-size: 100%;
 	display:none;
 }
 
@@ -427,7 +554,8 @@ a{
 	right:10px;
 	width:75px;
 	height:50px;
-	background: url("../images/logout_button.png") no-repeat right center;	
+	background: url("../images/logout_button.png") no-repeat right center;
+	background-size: 100%;
 	display:none;
 }
 
@@ -1017,11 +1145,6 @@ a .mail_section{
 	/*background: url("../images/stat_button.png") no-repeat left;*/	
 }
 
-#update_profile{	
-	background: url("../images/update_profile_button.png") no-repeat center;
-	margin:0 auto 0 auto;
-}
-
 #upload_image{
 	/*background: url("../images/upload_image_button.png") no-repeat right;*/
 	/*background: url("../images/upload_image_button2.png") no-repeat right;*/	
@@ -1387,7 +1510,12 @@ a .mail_section{
 #get_stat_div,
 #regions_list,
 #register_page,
-#cities_wrap,  
+#edit_profile_page,
+#forgot_password_page,
+#report_abuse_page,
+#contact_us_page,
+#edit_profile_page,
+#cities_wrap,
 .pic_wrap,
 .appTemplates,
 .new_mes_count, 
@@ -1396,12 +1524,23 @@ a .mail_section{
 }
 
 
+.noPicture{
+	width: 33%;
+}
+
+.noPicture img{
+	width:100%;
+	min-height:88px;
+	/*float:left;*/
+	border: 2px solid #fff;
+}
+
 .sortButtonWrap{
 	display:none; 
 	
 	width:100%;
 	height:60px;
-	background: #f7eed8;
+	background: #fff;
 	
 	position: fixed;
 	z-index: 500;
@@ -1450,6 +1589,84 @@ a .mail_section{
 
 
 
+#edit_profile_page .save .formButton{
+	margin-right: 25px;
+}
+
+
+#edit_profile_page .edit {
+	color: #000;
+	font-size: 16px;
+	line-height: 50px;
+}
+
+#edit_profile_page .sf_txt{
+	font-weight: bold;
+	line-height: 50px;
+	/*display:table;*/
+}
+
+#edit_profile_page .sf_sel_wrap, #edit_profile_page .edit div{
+	min-height:50px;
+	box-sizing: border-box;
+	padding-left:10px;
+}
+
+#edit_profile_page .sf_txt span {
+	/*display: table-cell;
+	vertical-align: middle;*/
+}
+
+#edit_profile_page .edit button.formButton {
+	font-size: 15px;
+	margin-top: 10px;
+	float: left;
+}
+
+#edit_profile_page .ui-btn {
+	padding: 0;
+}
+
+#edit_profile_page input[type="text"], #edit_profile_page input[type="password"] {
+	font-size: 15px;
+	color: #505050;
+	text-align: left;
+
+	height:40px;
+
+	margin-bottom: 20px;
+	margin-top: 20px;
+
+	-moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -khtml-border-radius:5px;
+    border-radius:5px;
+
+}
+
+
+.textar {
+	max-height: 51px;
+	line-height: 1em;
+	font-size: 12px;
+	overflow: auto;
+	padding: 10px 0;
+}
+
+.formButton {
+	background: #fa6f19;
+	color: #fff;
+	background-size: 100% 100%;
+	padding: 8px 5px;
+	border-radius: 5px;
+}
+
+.devider{
+	width:100%;
+	height:1px;
+	border-bottom: 1px solid #bababa;
+	cler:both;
+}
 
 
 
