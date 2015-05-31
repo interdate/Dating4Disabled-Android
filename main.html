@@ -303,29 +303,29 @@
 					<div class="stat_side">
 						<div class="items_wrap">
 							<div class="stat_title">Added You To Friends</div>
-							<div class="stat_value" onclick="app.getStatUsers('addedMeToFriends');">154</div>
+							<div class="stat_value" onclick="app.getStatUsers('addedMeToFriends');"></div>
 						</div>
 						<div class="items_wrap">
 							<div class="stat_title">Contacted You</div>
-							<div class="stat_value" onclick="app.getStatUsers('contactedMe');">229</div>
+							<div class="stat_value" onclick="app.getStatUsers('contactedMe');"></div>
 						</div>
 						<div class="items_wrap">
 							<div class="stat_title">Viewed My Profile</div>
-							<div class="stat_value" onclick="app.getStatUsers('lookedMe');">2</div>
+							<div class="stat_value" onclick="app.getStatUsers('lookedMe');"></div>
 						</div>
 					</div>
 					<div class="stat_side">
 						<div class="items_wrap">
 							<div class="stat_title">Added To Friends</div>
-							<div class="stat_value" onclick="app.getStatUsers('friends');">55</div>
+							<div class="stat_value" onclick="app.getStatUsers('friends');"></div>
 						</div>
 						<div class="items_wrap">
 							<div class="stat_title">Added To Black List</div>
-							<div class="stat_value" onclick="app.getStatUsers('blackList');">118</div>
+							<div class="stat_value" onclick="app.getStatUsers('blackList');"></div>
 						</div>
 						<div class="items_wrap">
 							<div class="stat_title">Contacted</div>
-							<div class="stat_value" onclick="app.getStatUsers('contactedThem');">3</div>
+							<div class="stat_value" onclick="app.getStatUsers('contactedThem');"></div>
 						</div>
 					</div>
 				</div>
@@ -1076,6 +1076,7 @@
 			<!-- START Chat Message Template -->
 			<div id="chatMessageTemplate">
 				<div class="[MESSAGE_TYPE] [MESSAGE_FLOAT]">[MESSAGE]</div>
+				<div class="message_status [MESSAGE_STATUS_VISIBILITY]"><img src="images/[MESSAGE_STATUS_IMAGE]"></div>
 				<div class="message_info [INFO]">sent: [DATE] time: [TIME]</div>
 			</div>
 			<!-- END Chat Message Template -->

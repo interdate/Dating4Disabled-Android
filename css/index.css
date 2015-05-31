@@ -1046,6 +1046,19 @@ a .mail_section{
 	background-color:#e0e1e2;	
 }
 
+.message_status {
+  float: right;
+  width: 39px;
+  height: 23px;
+}
+
+.message_status img {
+  height: 16px;
+  border-radius: 20px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+}
+
 .message_info{
 	width:70%;
 	font-size: 11px;
