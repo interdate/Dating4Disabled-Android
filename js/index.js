@@ -284,6 +284,7 @@ var app = {
 					app.logged = true;
 					app.ajaxSetup();
 					app.showPage('main_page');
+					window.scrollTo(0, 0);
 					$('#logout').show();
 					window.localStorage.setItem("userId", data.userId);
 					window.localStorage.setItem("userInput", user);
