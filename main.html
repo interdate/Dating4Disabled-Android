@@ -693,49 +693,33 @@
 
 
 						<form id="regForm" data-role="none" onsubmit="return false;">
-							<div class="regTxt lineHeight_50">E-mail</div><div class="regInput"><input type="text" name="userEmail" id="userEmail" data-role="none" maxlength="50" /></div>
-							<div class="clear"></div>
-							<div class="regTxt mar_top_8">Retype Email</div><div class="regInput"><input type="text" id="userEmail2" name="userEmail2" data-role="none" maxlength="50" /></div>
+							<div class="regTxt lineHeight_50">Email</div><div class="regInput"><input type="text" name="userEmail" id="userEmail" data-role="none" maxlength="50" /></div>
 							<div class="clear"></div>
 							<div class="regTxt lineHeight_50">Password</div><div class="regInput"><input type="password" name="userPass" id="userPass" maxlength="50" data-role="none" /></div>
 							<div class="clear"></div>
 							<div class="regTxt mar_top_8">Retype Password</div><div class="regInput"><input type="password" name="userPass2" id="userPass2" maxlength="50" data-role="none" /></div>
 							<div class="clear"></div>
 
-							<div class="regTxt lineHeight_50">Username</div><div class="regInput"><input type="text" name="userNic" id="userNic" data-role="none" maxlength="50" /></div>
-							<div class="clear"></div>
-
-
+							<div class="regTxt lineHeight_50">Username</div><div class="regInput"><input type="text" name="userNick" id="userNick" data-role="none" maxlength="50" /></div>
 
 							<div class="regTxt lineHeight_50">Gender</div>
-							<div class="regInput">
-
-
-
-
+							<div class="regInput" style="width:180px;">
 								<select name="userGender" id="userGender">
-									<option value="0" selected="selected">Male</option>
+									<option value="" selected="selected">Choose</option>
+									<option value="0">Male</option>
 									<option value="1">Female</option>
 									<option value="2">Other</option>
 								</select>
+							</div>
+							<div class="clear"></div>
 
-
-
-								<!--
-                                <div data-role="fieldcontain">
-                                <select name="userGender" id="confirm" data-role="slider" data-theme="c" data-track-theme="c">
-                                <option value="0">Male</option>
-                                <option value="1">Female</option>
-                                </select>
-                                </div>
-                                 -->
-
-
+							<div class="regTxt mar_top_8">Sexual Preference</div>
+							<div class="regInput sexPreferenceList" style="width:180px;">
 
 							</div>
 							<div class="clear"></div>
 
-							<div class="bold"> Your date of birth </div>
+							<div class="bold">Date Of Birth</div>
 							<div class="clear"></div>
 							<div class="regInput">
 								<div id="birthDate" class="left">
@@ -744,17 +728,6 @@
 							</div>
 							<div class="clear"></div>
 
-
-
-
-
-							<div class="regTxt mar_top_8">Sexual Preference</div>
-							<div class="regInput" style="width:180px;">
-								<select name="sexPrefId" id="sex_preference_list">
-
-								</select>
-							</div>
-							<div class="clear"></div>
 
 							<div class="regTxt lineHeight_50">Country</div>
 							<div class="regInput" style="width:180px;">
@@ -779,7 +752,7 @@
 							<div class="clear"></div>
 
 
-							<div class="regTxt mar_top_8">a of Origin</div>
+							<div class="regTxt mar_top_8">Country Of Origin</div>
 							<div class="regInput" style="width:180px;">
 								<select name="countryOfOriginCode" id="countries_list2">
 									<option value="">Choose Country</option>
@@ -787,26 +760,125 @@
 							</div>
 							<div class="clear"></div>
 
-							<div class="regTxt lineHeight_50">About Me</div><div class="regInput"><textarea name="aboutMe" id="aboutMe" data-role="none"></textarea></div>
+
+							<div class="regTxt mar_top_8">First Name</div><div class="regInput"><input type="text" name="firstName" id="firstName" data-role="none" maxlength="50" /></div>
 							<div class="clear"></div>
 
-							<div class="regTxt lineHeight_8">Looking For</div><div class="regInput"><textarea name="lookingFor" id="lookingFor" data-role="none"></textarea></div>
+
+							<div class="regTxt mar_top_8">Last Name</div><div class="regInput"><input type="text" name="lastName" id="lastName" data-role="none" maxlength="50" /></div>
 							<div class="clear"></div>
 
-							<div class="regTxt mar_top_8">Life Challenge</div>
-							<div class="regInput" style="width:180px;">
-								<select name="healthId" id="health_list">
+							<div class="regTxt mar_top_8">Marital Status</div>
+							<div class="regInput maritalStatusList" style="width:180px;">
 
-
-								</select>
 							</div>
 							<div class="clear"></div>
 
-							<div class="regTxt mar_top_8">Mobility</div>
-							<div class="regInput" style="width:180px;">
-								<select name="mobilityId" id="mobility_list">
+							<div class="regTxt lineHeight_50">Children</div>
+							<div class="regInput childrenList" style="width:180px;">
 
-								</select>
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Ethnicity</div>
+							<div class="regInput ethnicityList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Religion</div>
+							<div class="regInput religionsList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Education</div>
+							<div class="regInput educationList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Occupation</div>
+							<div class="regInput occupationList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Income</div>
+							<div class="regInput incomeList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Language</div>
+							<div class="languageList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Smoking</div>
+							<div class="regInput smokingList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Drinking</div>
+							<div class="regInput drinkingList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt mar_top_8">Body Style</div>
+							<div class="regInput bodyTypeList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+
+							<div class="regTxt lineHeight_50">Height</div>
+							<div class="regInput heightList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+
+							<div class="regTxt mar_top_8">Eyes Color</div>
+							<div class="regInput eyesColorList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Hair Color</div>
+							<div class="regInput hairColorList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+
+							<div class="regTxt lineHeight_50">About Me</div>
+							<div class="regInput"><textarea name="aboutMe" id="aboutMe" data-role="none"></textarea></div>
+							<div class="clear"></div>
+
+
+							<div class="regTxt mar_top_8">Looking For</div>
+							<div class="regInput"><textarea name="lookingFor" id="lookingFor" data-role="none"></textarea></div>
+							<div class="clear"></div>
+
+							<div class="regTxt mar_top_8">Life Challenge</div>
+							<div class="regInput healthList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt lineHeight_50">Mobility</div>
+							<div class="regInput mobilityList" style="width:180px;">
+
+							</div>
+							<div class="clear"></div>
+
+							<div class="regTxt mar_top_8">Looking For</div>
+							<div class="lookingForList" style="width:180px;">
+
 							</div>
 							<div class="clear"></div>
 
@@ -818,6 +890,9 @@
 							<br />
 							<br />
 
+
+							<br />
+							<br />
 							<div class="bold">I confirm that I have read and agreed to the Terms and Conditions of Service of membership at Dating4disabled.com.</div>
 							<div class="clear"></div>
 
@@ -830,18 +905,16 @@
 
 
 							<br />
+							<br />
+							<br />
 
-							<!-- <label><input type="checkbox" name="remember_me" value="remember_me"  /> <span>remember me</span> </label>  -->
+
+
 
 						</form>
 
-
-
 						<button data-theme="e" onclick="app.sendRegData();">Send</button>
 
-						<br /><br />
-						<br /><br />
-						<br /><br />
 
 					</div>
 				</div>
