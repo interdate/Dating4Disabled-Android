@@ -56,6 +56,8 @@
      - preloader.gif (for browsers that do not support CSS animations) -->
 	<link rel="stylesheet" href="js/photoswipe/default-skin/default-skin.css">
 
+	<link rel="stylesheet" href="js/swiper/css/swiper.min.css">
+	<script src="js/swiper/js/swiper.jquery.min.js"></script>
 
 </head>
 
@@ -67,7 +69,7 @@
 		<div id="header">
 
 			<div class="new_mes" onclick="app.getMessenger();"><div class="new_mes_count2"></div></div>
-
+            <div id="likesNotifications" onclick="app.getLikesNotifications();"><div id="likesCount" class="hidden"></div></div>
 			<!--
 			<div class="new_mes" onclick="app.getMessenger();">Messages<div class="new_mes_count2"></div></div>
 			<div id="top_left_buttons">
@@ -91,7 +93,50 @@
 
 		<!--Stop Header-->
 
+
+        <!--Start Search Results Page -->
+        <div id="do_likes_page"  class="appPage">
+
+            <!-- Slider main container -->
+            <div class="swiper-container">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    <div class="swiper-slide"></div>
+                    <div class="swiper-slide"></div>
+                    <div class="swiper-slide"></div>
+                </div>
+
+                <!--
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-scrollbar"></div>
+                -->
+
+
+            </div>
+
+            <div class="toolbar">
+
+                <div class="box"><div class="unlike icon" onclick="app.test();"></div></div>
+                <div class="box"><div class="chat icon" onclick="app.getChatWith();"></div></div>
+                <div class="box"><div class="like icon" onclick="app.doLike();"></div></div>
+
+            </div>
+
+
+        </div>
+        <!--End Search Results Page -->
+
+
+        <div id="bingo_page" class="appPage">
+
+        </div>
+
+
 		<div style="width:100%; height:70px;"></div>
+
 
 		<!--Start Login Page -->
 		<div id="login_page" class="appPage">
@@ -171,19 +216,19 @@
 					<div class="clear"></div>
 
 					<div id="looked_me" onclick="app.getStatUsers('lookedMe');"></div>
-					<div id="looked_them" onclick="app.getStatUsers('looked');"></div>
+                    <div id="like_but" onclick="app.getUsersForLikes();"><!--<div class="text">Arena</div>--></div>
 					<div id="contacted_them" onclick="app.getStatUsers('contactedThem');"></div>
 
 					<div class="clear"></div>
 
 					<div id="favorites" onclick="app.getStatUsers('friends');"></div>
-					<div id="profile" onclick="app.getMyProfileData();"></div>
+                    <div id="looked_them" onclick="app.getStatUsers('looked');"></div>
 					<div id="update_profile" onclick="app.getEditProfile();"></div>
 
 					<div class="clear"></div>
 
 
-
+                    <div id="profile" onclick="app.getMyProfileData();"></div>
 					<div id="manage_images" onclick="app.displayUserImages();"></div>
 					<div id="contact_us" onclick="app.showPage('contact_us_page');"></div>
 					<!--<div id="purchase_subscr" onclick="app.getSubscription();"></div>-->
@@ -486,7 +531,7 @@
 
 
 
-		<!--Start Search From Page -->
+		<!--Start Profile Page -->
 		<div id="user_profile_page"  class="appPage">
 			<div data-role="content">
 				<div class="content_wrap">
@@ -569,6 +614,8 @@
 				</div>
 			</div>
 		</div>
+        <!--End Profile Page -->
+
 
 		<!--Start Contact Us Page -->
 		<div id="contact_us_page"  class="appPage">
@@ -588,6 +635,26 @@
 			</div>
 		</div>
 		<!--End Messenger Page -->
+
+
+        <!--Start User Likes Page -->
+        <div id="likes_notifications_page" class="appPage">
+            <div data-role="content">
+                <div class="content_wrap">
+                    <h1>Notifications From The Arena</h1>
+                    <div class="dots"></div>
+                    <div class="notText">
+                        This is the place where you can learn who liked your photo on The Arena.
+                        <br>
+                        If someone you like likes you back - both of you will receive a Bingo! notification.
+                    </div>
+                    <div class="notifications_wrap">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End User Likes Page -->
 
 
 		<!--Start Messenger Page -->
@@ -1146,6 +1213,20 @@
 			</div>
 			<!-- END Messenger Template -->
 
+            <!-- START Like Notification Template -->
+            <div id="likeNotificationTemplate">
+                <div class="mail_section [IS_READ_CLASS]" onclick="[FUNCTION]">
+                    <div class="txt">
+                        <strong>[USERNICK]</strong><br />
+                        [TEXT]
+                    </div>
+                    <img src="[IMAGE]" />
+                    <span>[DATE]</span>
+                    <div class="[BINGO_CLASS]"></div>
+                </div>
+            </div>
+            <!-- END Like Notification Template -->
+
 			<!-- START Chat Message Template -->
 			<div id="chatMessageTemplate">
 				<div class="message_cont [MESSAGE_TYPE] [MESSAGE_FLOAT]">[MESSAGE]</div>
@@ -1326,6 +1407,35 @@
 
 
 			<!-- END Edit Profile Template -->
+
+            <!-- START Bingo Template -->
+            <div id="bingoTemplate">
+
+                <div class="bingoWrapper">
+
+                    <div class="close" onclick="app.back(); app.bingoIsActive=false;"></div>
+                    <div class="logo"></div>
+
+                    <div class="imagesWrapper">
+                        <div class="imageCont" style="background-image: url('[USER_IMAGE_URL_1]');"></div>
+                        <div class="plus"></div>
+                        <div class="imageCont" style="background-image: url('[USER_IMAGE_URL_2]');"></div>
+                    </div>
+
+                    <div class="clear"></div>
+
+
+                    <div class="txt">
+                        [USERNICK]  likes you too!
+                    </div>
+
+                    <div class="chat" onclick="app.getChat('[USER_ID]', '[USERNICK]');"></div>
+                    <div class="ignore" onclick="app.back(); app.bingoIsActive=false;"></div>
+
+                </div>
+
+            </div>
+            <!-- END Bingo Template -->
 
 
 	</div>

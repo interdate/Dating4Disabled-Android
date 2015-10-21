@@ -12,7 +12,7 @@ getUsersRequest = '';
 checkNewMessagesRequest = '';
 newMessages = '';
 refreshChat = '';
-
+checkBingo = '';
 
 
 var app = { 
@@ -25,7 +25,7 @@ var app = {
 	},
 	*/
 		
-		
+	apiUrl : 'http://m.dating4disabled.com/api/v6',
 	pictureSource : '',
 	destinationType : '',
 	encodingType : '',	
@@ -57,9 +57,15 @@ var app = {
 	positionSaved : false,
 	logged: false,
 	newMessagesCount : 0,
+	newNotificationsCount: 0,
+	contactCurrentAllMessagesNumber : 0,
 	contactCurrentReadMessagesNumber : 0,
 	promptRegConfirmation: false,
-	
+
+	swiper: null,
+    bingoIsActive: false,
+    bingos: [],
+
 		
 	init: function(){
 
@@ -144,7 +150,7 @@ var app = {
         }
 		
 		$.ajax({				
-			url: 'http://m.dating4disabled.com/api/v5/user/logout',
+			url: app.apiUrl + '/user/logout',
 			success: function(data, status){
 				//alert(JSON.stringify(data));
 				if(data.logout == 1){
@@ -171,6 +177,7 @@ var app = {
 				$('#user_input').find('input').val(userInput);
 			$('.appPage').hide();
 			$('.new_mes').hide();
+			$('#likesNotifications').hide();
 			$("#login_page").show();
 			$('#back').hide();
 			$('#logout').hide();
@@ -190,6 +197,7 @@ var app = {
 			$('#back').hide();
 			$('#logout').show();
 			$('#sign_up').hide();
+			$('#likesNotifications').removeAttr('style').show();
 			//$('#contact').show();
 			app.currentPageId = 'main_page';
 			app.currentPageWrapper = $('#'+app.currentPageId);
@@ -201,6 +209,7 @@ var app = {
 		app.searchFuncsMainCall = true;
 		app.setBannerDestination();
 		app.checkNewMessages();
+		app.checkBingo();
 		//app.pushNotificationInit();
 		app.sendUserPosition();
 	},
@@ -223,7 +232,7 @@ var app = {
 		app.startLoading();
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/login',
+			url: app.apiUrl + '/user/login',
 			error: function(response){
 				//alert(JSON.stringify(response));
 			},
@@ -253,7 +262,7 @@ var app = {
 
 	setBannerDestination: function(){
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/banner',
+			url: app.apiUrl + '/user/banner',
 			success: function(response, status){
 				app.response = response;
 				//alert(JSON.stringify(app.response));
@@ -272,7 +281,7 @@ var app = {
 		window.localStorage.setItem("pass",pass);
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/login',
+			url: app.apiUrl + '/user/login',
 			beforeSend: function(xhr){
 				user = window.localStorage.getItem("user");
 				pass = window.localStorage.getItem("pass");
@@ -321,7 +330,7 @@ var app = {
 		//return;
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/location',
+			url: app.apiUrl + '/user/location',
 			type: 'Post',
 			data:JSON.stringify(data),
 			success: function(response){
@@ -341,7 +350,7 @@ var app = {
 
 	printUsers: function(){
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/users/recently_visited/2',
+			url: app.apiUrl + '/users/recently_visited/2',
 			success: function(data, status){
 				for ( var i = 0; i < data.users.length; i++) {
 					$("#udp_"+i).find(".user_photo_wrap .user_photo").attr("src",data.users[i].mainImage.url);
@@ -443,7 +452,7 @@ var app = {
     persistGcmDeviceId: function(){
 
     	$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/gcmDeviceId',
+			url: app.apiUrl + '/user/gcmDeviceId',
 			type: 'Post',
 			data: JSON.stringify({
 				gcmDeviceId: app.gcmDeviceId
@@ -470,7 +479,7 @@ var app = {
     },
 
 	back: function(){
-		$.fancybox.close();
+		//$.fancybox.close();
 		$(window).unbind("scroll");
 		window.scrollTo(0, 0);
 
@@ -519,12 +528,15 @@ var app = {
 		if(app.currentPageId == 'main_page'){
 			$('#back').hide();
 			$('#sign_up').hide();
-
 			//$('#contact').show();
+			$('#likesNotifications').removeAttr('style').show();
+            $('#logout').show();
 		}
 		else if(app.currentPageId == 'login_page'){
 			$('#back').hide();
 			$('#sign_up').show();
+			$('#logout').hide();
+            $('#likesNotifications').hide();
 		}
 		else{
 			$('#back').show();
@@ -533,7 +545,13 @@ var app = {
 				$('.new_mes_count2').html(app.newMessagesCount);
 				$(".new_mes").show();
 			}
+			$('#logout').hide();
+			$('#likesNotifications').css({left:'auto',right:'0px'}).show();
 		}
+
+		if(app.currentPageId == 'register_page' || app.currentPageId == 'recovery_page'){
+        	$('#likesNotifications').hide();
+        }
 
 		$(window).unbind("scroll");
 
@@ -624,7 +642,7 @@ var app = {
 
 		if(app.action == 'getOnlineNow'){
 			//app.requestUrl = 'http://m.dating4disabled.com/api/v5/users/online/'+app.itemsPerPage+'/'+app.pageNumber;
-			app.requestUrl = 'http://m.dating4disabled.com/api/v5/users/online/count:'+app.itemsPerPage+'/page:'+app.pageNumber+'/sort:'+app.sort;
+			app.requestUrl = app.apiUrl + '/users/online/count:'+app.itemsPerPage+'/page:'+app.pageNumber+'/sort:'+app.sort;
 		}
 		else if(app.action == 'getSearchResults'){
 			var countryCode = $('#countries_list').val();
@@ -635,11 +653,11 @@ var app = {
 			var nickName = $('.nickName').val();
 			var gender = $('#gender').val();
 			//alert(nickName);
-			app.requestUrl = 'http://m.dating4disabled.com/api/v5/users/search/gender:'+gender+'/country:'+countryCode+'/region:'+regionCode+'/age:'+ageFrom+'-'+ageTo+'/disability:'+disabilityId+'/nickName:'+nickName+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
+			app.requestUrl = app.apiUrl + '/users/search/gender:'+gender+'/country:'+countryCode+'/region:'+regionCode+'/age:'+ageFrom+'-'+ageTo+'/disability:'+disabilityId+'/nickName:'+nickName+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
 			//app.requestUrl = 'http://m.dating4disabled.com/api/v5/users/search/gender:'+gender+'/country:'+countryCode+'/region:'+regionCode+'/age:'+ageFrom+'-'+ageTo+'/disability:'+disabilityId+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
 		}
 		else if(app.action == 'getStatResults'){
-			app.requestUrl = 'http://m.dating4disabled.com/api/v5/user/statistics/'+app.statAction+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
+			app.requestUrl = app.apiUrl + '/user/statistics/'+app.statAction+'/count:'+app.itemsPerPage+'/page:'+app.pageNumber;
 		}
 
 		getUsersRequest = $.ajax({
@@ -770,7 +788,7 @@ var app = {
 		var userId = window.localStorage.getItem("userId");
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/profile/'+userId,
+			url: app.apiUrl + '/user/profile/'+userId,
 			success: function(user, status, xhr){
 
 				app.showPage('my_profile_page');
@@ -852,7 +870,7 @@ var app = {
 	getDisabilities: function(){
 
     	$.ajax({
-    		url: 'http://m.dating4disabled.com/api/v5/list/health',
+    		url: app.apiUrl + '/list/health',
     		success: function(list, status, xhr){
     			var html = (app.currentPageId == 'register_page') ? '' : '<option value="">All</option>';
     			for(var i in list.items){
@@ -871,7 +889,7 @@ var app = {
     getMobility: function(){
 
     	$.ajax({
-    	   url: 'http://m.dating4disabled.com/api/v5/list/mobility',
+    	   url: app.apiUrl + '/list/mobility',
     	   success: function(list, status, xhr){
     	       var html = (app.currentPageId == 'register_page') ? '' : '<option value="">All</option>';
     	       for(var i in list.items){
@@ -889,7 +907,7 @@ var app = {
 
 	getSexPreference: function(){
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/list/sexPreference',
+			url: app.apiUrl + '/list/sexPreference',
 			success: function(list, status, xhr){
 				var html = '';
 				for(var i in list.items){
@@ -908,7 +926,7 @@ var app = {
 
 	getCountries: function(){
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/list/countries',
+			url: app.apiUrl + '/list/countries',
 			success: function(list, status, xhr){
 			   var html = (app.currentPageId == 'register_page') ? '<option value="">Choose</option>' : '';
 
@@ -957,7 +975,7 @@ var app = {
 
 	getRegions: function(countryCode){
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/list/regions/'+countryCode,
+			url: app.apiUrl + '/list/regions/'+countryCode,
 			success: function(list, status, xhr){
 				//var html = '<select>';
 				var html = '<select name="regionCode" id="regionCode"><option value="">Choose</option>';
@@ -1000,7 +1018,7 @@ var app = {
 
 	getCities: function(countryCode,regionCode){
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/list/cities/'+countryCode+'/'+regionCode,
+			url: app.apiUrl + '/list/cities/'+countryCode+'/'+regionCode,
 			success: function(list, status, xhr){
 				app.container.find("#cities_wrap").hide();
 				if(list.itemsNumber > 0){
@@ -1036,7 +1054,7 @@ var app = {
 			);
 
 			$.ajax({
-				url: 'http://m.dating4disabled.com/api/v5/user',
+				url: app.apiUrl + '/user',
 				//url: 'http://m.dating4disabled.com/api/insert.asp',
 				type: 'Post',
 				data: data,
@@ -1280,7 +1298,7 @@ var app = {
     	var abuseMessage = $('#abuseMessage').val();
 
     	$.ajax({
-    		url: 'http://m.dating4disabled.com/api/v5/user/abuse/'+app.reportAbuseUserId,
+    		url: app.apiUrl + '/user/abuse/'+app.reportAbuseUserId,
     		type: 'Post',
     		contentType: "application/json; charset=utf-8",
     		data: JSON.stringify({
@@ -1304,7 +1322,7 @@ var app = {
        	}
 
        	$.ajax({
-       		url: 'http://m.dating4disabled.com/api/v5/contactUs',
+       		url: app.apiUrl + '/contactUs',
        		type: 'Post',
        		contentType: "application/json; charset=utf-8",
        		data: JSON.stringify({
@@ -1338,7 +1356,7 @@ var app = {
 		app.reportAbuseUserId = userId;
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/profile/'+userId,
+			url: app.apiUrl + '/user/profile/'+userId,
 			type: 'Get',
 			success: function(user, status, xhr){
 				//alert(user.userId);
@@ -1532,7 +1550,7 @@ var app = {
 		app.startLoading();
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/contacts',
+			url: app.apiUrl + '/user/contacts',
 			success: function(response){
 				app.response = response;
 				app.showPage('messenger_page');
@@ -1567,7 +1585,7 @@ var app = {
 		app.startLoading();
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/chat/'+app.chatWith,
+			url: app.apiUrl + '/user/chat/'+app.chatWith,
 			success: function(response){
 				app.response = response;
 				app.contactCurrentReadMessagesNumber = app.response.contactCurrentReadMessagesNumber;
@@ -1615,7 +1633,7 @@ var app = {
 				var messageStatusVisibility = 'hidden';
 				var messageStatusImage = '';
 				//message.text = message.text + appendToMessage;
-				if(app.response.chat.abilityReadingMessages == 0){
+				if(app.response.chat.abilityReadingMessages == 0 && message.isRead == 0){
 					message.text = appendToMessage;
 					message.text = message.text.replace("[MESSAGE_ID]", message.id);
 				}
@@ -1683,7 +1701,7 @@ var app = {
 
 
 		$.ajax({
-		   url: 'http://m.dating4disabled.com/api/v5/user/messenger/setMessagesAsRead',
+		   url: app.apiUrl + '/user/messenger/setMessagesAsRead',
 		   error: function(response){
 			   console.log(JSON.stringify(response));
 		   },
@@ -1706,7 +1724,7 @@ var app = {
 		//console.log('http://m.dating4disabled.com/api/v5/user/chat/useFreePointToReadMessage/' + messageId);
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/user/chat/useFreePointToReadMessage/' + messageId,
+			url: app.apiUrl + '/user/chat/useFreePointToReadMessage/' + messageId,
 			   error: function(response){
 			       console.log(JSON.stringify(response));
 			   },
@@ -1714,6 +1732,7 @@ var app = {
 			   console.log($(clickedObj).parent().html());
 			   $(clickedObj).parents('.message_cont').html(response.messageText);
 			   app.stopLoading();
+			   app.setMessagesAsRead([messageId]);
 			}
 		});
 	},
@@ -1733,7 +1752,7 @@ var app = {
 			$('#message').val('');
 			app.startLoading();
 			$.ajax({
-				url: 'http://m.dating4disabled.com/api/v5/user/chat/'+app.chatWith,
+				url: app.apiUrl + '/user/chat/'+app.chatWith,
 				type: 'Post',
 				contentType: "application/json; charset=utf-8",
 				data: JSON.stringify({
@@ -1767,7 +1786,7 @@ var app = {
 
 		if(app.currentPageId == 'chat_page'){
 			refreshChat = $.ajax({
-				url: 'http://m.dating4disabled.com/api/v5/user/chat/'+app.chatWith+'/'+app.contactCurrentReadMessagesNumber+'/refresh',
+				url: app.apiUrl + '/user/chat/'+app.chatWith+'/'+app.contactCurrentReadMessagesNumber+'/refresh',
 				type: 'Get',
 				error:function(error){
 					  console.log(JSON.stringify(error));
@@ -1805,9 +1824,12 @@ var app = {
 
 	checkNewMessages: function(){
 
-		if(app.currentPageId != 'login_page' && app.currentPageId != 'register_page' && app.currentPageId != 'forgot_password_page'){
+		var user = window.localStorage.getItem("user");
+        var pass = window.localStorage.getItem("pass");
+
+		if(user != '' && pass != '' && app.currentPageId != 'login_page' && app.currentPageId != 'register_page' && app.currentPageId != 'forgot_password_page'){
 			checkNewMessagesRequest = $.ajax({
-				url: 'http://m.dating4disabled.com/api/v5/user/newMessagesCount',
+				url: app.apiUrl + '/user/newMessagesCount',
 				type: 'Get',
 				complete: function(response, status, jqXHR){
 					//don't remove this "complete" function, this is overriding of global "complete".
@@ -1819,7 +1841,7 @@ var app = {
 						app.newMessagesCount = app.response.newMessagesCount;
 						if(app.currentPageId != 'login_page' && app.currentPageId != 'main_page' && app.currentPageId != 'register_page' && app.currentPageId != 'forgot_password_page'){
 							$('.new_mes_count2').html(app.newMessagesCount);
-							//$(".new_mes").show();
+							$(".new_mes").show();
 						}
 						else{
 							$(".new_mes").hide();
@@ -1833,11 +1855,23 @@ var app = {
 						$('.new_mes').hide();
 						$('#new_mes_count').hide();
 					}
+
+					if(response.newNotificationsCount > 0){
+                    	app.newNotificationsCount = response.newNotificationsCount;
+                    	if(app.currentPageId != 'login_page' && app.currentPageId != 'register_page' && app.currentPageId != 'recovery_page'){
+                        	$('#likesCount').html(app.newNotificationsCount).show();
+                    	}
+                    }
+                    else{
+                    	app.newNotificationsCount = 0;
+                        $('#likesCount').hide();
+                        //$('#likesCount').html(app.newNotificationsCount).show();
+                    }
+
 					newMessages = setTimeout(app.checkNewMessages, 10000);
 				}
 			});
 		}
-
 	},
 
 	getSubscription: function(){
@@ -1897,13 +1931,13 @@ var app = {
 	},
 
 	deleteImage: function(){
-		app.requestUrl = 'http://m.dating4disabled.com/api/v5/user/images/delete/' + app.imageId,
+		app.requestUrl = app.apiUrl + '/user/images/delete/' + app.imageId,
 		app.requestMethod = 'Post';
 		app.getUserImages();
 	},
 
 	displayUserImages: function(){
-		app.requestUrl = 'http://m.dating4disabled.com/api/v5/user/images';
+		app.requestUrl = app.apiUrl + '/user/images';
 		app.requestMethod = 'Get';
 		app.getUserImages();
 	},
@@ -1991,7 +2025,7 @@ var app = {
         var ft = new FileTransfer();
         ft.upload(
         	imageURI,
-        	encodeURI("http://m.dating4disabled.com/api/v5/user/image"),
+        	encodeURI(app.apiUrl + "/user/image"),
         	app.uploadSuccess,
         	app.uploadFailure,
 	        options
@@ -2038,7 +2072,7 @@ var app = {
 			app.startLoading();
 
     		$.ajax({
-    			url: 'http://m.dating4disabled.com/api/v5/user/data',
+    			url: app.apiUrl + '/user/data',
     			success: function(response){
     			   user = response.user;
     			   //alert(JSON.stringify(response));
@@ -2137,7 +2171,7 @@ var app = {
 
 
     		$.ajax({
-    			   url:'http://m.dating4disabled.com/api/v5/user/data',
+    			   url:app.apiUrl + '/user/data',
     			   //dataType: 'json',
     			   type: 'post',
     			   data: JSON.stringify({name:name,val:val}),
@@ -2179,7 +2213,7 @@ var app = {
 					   val = $(el).parent().find('.ui-select span').eq(1).text();
 					   //alert(val);
 					   }
-					   //if(val=='0'&&name=='userGender')val = 'אישה';
+					   //if(val=='0'&&name=='userGender')val = '�?ישה';
 					   //if(val=='1'&&name=='userGender')val = 'גבר';
 
 					   if(name=='userBirthday') val=val.replace(/-/g,' / ');
@@ -2276,7 +2310,7 @@ var app = {
 
 
 		$.ajax({
-			url: 'http://m.dating4disabled.com/api/v5/list/' + entity,
+			url: app.apiUrl + '/list/' + entity,
 			success: function(list, status, xhr){
 			   //console.log(JSON.stringify(list));
 			   var html = '';
@@ -2388,7 +2422,7 @@ var app = {
 
 
 		$.ajax({
-        	url: 'http://m.dating4disabled.com/api/v5/user/passwordRecovery',
+        	url: app.apiUrl + '/user/passwordRecovery',
         	type: 'Post',
         	error: function(error){
         		alert(JSON.stringify(error));
@@ -2410,7 +2444,344 @@ var app = {
         	}
         });
 	},
-	
+
+
+	getUsersForLikes: function(supposedToBeLikedUserId, notifId){
+
+    	app.startLoading();
+
+    	if(!supposedToBeLikedUserId){
+    		supposedToBeLikedUserId = 0;
+    	}
+
+    	if(!notifId){
+           	notifId = 0;
+        }
+
+        var url = app.apiUrl + '/users/forLikes/' + supposedToBeLikedUserId + '/' + notifId;
+        //alert(url);
+        //return;
+
+
+    	$.ajax({
+          	url: url,
+           	type: 'Get',
+           	timeout: 10000,
+           	error: function(error){
+           		//alert("ERROR:" + JSON.stringify(error));
+           	},
+           	success: function(response){
+				//alert(JSON.stringify(response));
+    			if(response.userHasNoMainImage){
+               		app.alert("To enter The Arena you need to update a photo.");
+                   	app.displayUserImages();
+                }
+
+           		//alert("RESP:" + JSON.stringify(response));
+                if(response.users.itemsNumber > 0){
+    				app.showPage('do_likes_page');
+                   	//console.log("NUMBER: " + response.users.itemsNumber);
+                   	//console.log("ITEMS: " + JSON.stringify(response));
+
+
+    				var wrapper = $('.swiper-wrapper');
+    				var userId = window.localStorage.getItem("userId");
+    				var html = '';
+    				//wrapper.html(html);
+    				//alert(response.users.items.length);
+    				for(var i in response.users.items){
+
+    					if (i < 200){
+
+    						var user = response.users.items[i];
+
+
+    						//console.log("USER: " + JSON.stringify(user));
+
+
+    						//html = html + '<div class="swiper-slide">'+i+'</div>';
+
+    						html = html + '<div class="swiper-slide"><div id="' + user.id + '" class="cont" style="background-image: url('
+    							+ response.users.imagesStoragePath
+    							+ '/'
+    							+ user.imageId
+    							+ '.'
+    							+ user.imageExt
+    							+ ')"><div class="nickname" onclick="app.getUserProfile(' + user.id + ')">' + user.nickName + ', '+ user.age +'</div></div></div>';
+
+    						//if (i < 3){
+    							//wrapper.append(html);
+    							//html = '';
+    						//}
+    						//wrapper.append(html);
+    					}
+    					if (i == 200) break;
+    				}
+
+                    wrapper.html(html);
+                    //wrapper.append(html);
+                    //console.log("SWIPER HTML: " + wrapper.html());
+    				app.initSwiper();
+    				app.showPage('do_likes_page');
+                }
+           	}
+        });
+    },
+
+
+    initSwiper: function(){
+
+    	if(app.swiper != null){
+    		app.swiper.destroy();
+    	}
+
+    	app.swiper = new Swiper ('.swiper-container', {
+            // Optional parameters
+            direction: 'horizontal',
+            //initialSlide:10,
+            //spaceBetween: 50,
+            loop: true,
+            speed: 100,
+            nextButton: '.unlike.icon'
+
+            // If we need pagination
+            //pagination: '.swiper-pagination',
+
+            // Navigation arrows
+            //nextButton: '.swiper-button-next',
+            //prevButton: '.swiper-button-prev',
+
+            // And if we need scrollbar
+            //scrollbar: '.swiper-scrollbar',
+        });
+
+    },
+
+
+    doLike: function(){
+
+    	var userId = $('.swiper-slide-active .cont').attr("id");
+
+    	$.ajax({
+           	url: app.apiUrl + '/user/like/' + userId,
+           	type: 'Post',
+           	error: function(error){
+           		console.log("ERROR: " + JSON.stringify(error));
+           	},
+           	success: function(response){
+           		//console.log("SUCCESS: " + JSON.stringify(response));
+           		app.swiper.slideNext();
+           		$('#' + userId).parents('.swiper-slide').remove();
+           		app.checkBingo();
+           	}
+        });
+    },
+
+
+    test: function(){
+
+    },
+
+
+    getChatWith: function(){
+    	var chatWith = $('.swiper-slide-active .cont').attr("id");
+    	var userNick = $('.swiper-slide-active .cont .nickname').text();
+    	console.log($('.swiper-container').html());
+    	app.getChat(chatWith, userNick);
+    },
+
+
+    getLikesNotifications: function(){
+
+    	app.startLoading();
+
+    	$.ajax({
+           	url: app.apiUrl + '/user/likes/notifications',
+           	type: 'Get',
+           	error: function(error){
+           		//console.log("ERROR: " + JSON.stringify(error));
+           	},
+           	success: function(response){
+           		app.stopLoading();
+           		//console.log("SUCCESS: " + JSON.stringify(response));
+           		app.showPage('likes_notifications_page');
+				//alert(JSON.stringify(response));
+           		if(response.likesNotifications.itemsNumber > 0){
+           		    var template = $('#likeNotificationTemplate').html();
+           		  	var html = '';
+
+           		    for(var i in response.likesNotifications.items){
+           		    	var currentTemplate = template;
+    					var notification = response.likesNotifications.items[i];
+
+    					notification.nickName = notification.nickName.replace(/'/g, "?");
+
+    					imageUrl = response.likesNotifications.imagesStoragePath
+    						+ '/'
+                            + notification.imageId
+                            + '.'
+                            + notification.imageExt
+                        ;
+
+                        var isReadClass = (notification.isRead == 1) ? 'isRead' : '';
+                        var bingoClass = (notification.notificationId == 2) ? 'bingo' : '';
+                        var func = (notification.notificationId == 2)
+                           	? "app.setUserNotificationAsRead(" + notification.id + ", this);app.getChat('" +  notification.userId  + "','" + notification.nickName + "');"
+                           	: "app.getUsersForLikes('" + notification.userId  + "','" + notification.id  + "')"
+                        ;
+                        if(notification.bingo == 1 && notification.notificationId == 1){
+                        	//func = "app.getUsersForLikes()";
+                        	func = "app.setUserNotificationAsRead(" + notification.id + ", this);app.getChat('" +  notification.userId  + "','" + notification.nickName + "');";
+                        }
+
+    					currentTemplate = currentTemplate.replace("[IMAGE]", imageUrl);
+                       	currentTemplate = currentTemplate.replace(/\[USERNICK\]/g,notification.nickName);
+                       	currentTemplate = currentTemplate.replace("[FUNCTION]", func);
+                       	currentTemplate = currentTemplate.replace("[TEXT]",notification.template.replace("[USERNICK]", notification.nickName));
+                       	currentTemplate = currentTemplate.replace("[DATE]", notification.date);
+                       	currentTemplate = currentTemplate.replace("[USER_ID]", notification.userId);
+                       	currentTemplate = currentTemplate.replace("[IS_READ_CLASS]", isReadClass);
+                       	currentTemplate = currentTemplate.replace("[BINGO_CLASS]", bingoClass);
+
+    					html = html + currentTemplate;
+    				}
+
+    				console.log("HTML: " + html);
+
+    				app.currentPageWrapper.find('.notifications_wrap').html(html);
+
+    			}else{
+					app.currentPageWrapper.find('.notifications_wrap').html('');
+    			}
+           	}
+        });
+    },
+
+
+    checkBingo: function(){
+
+    	if(app.currentPageId != 'login_page' && app.currentPageId != 'register_page' && app.currentPageId != 'recovery_page'){
+
+    		if(checkBingo != ''){
+    			checkBingo.abort();
+    		}
+
+    		checkBingo = $.ajax({
+    			url: app.apiUrl + '/user/bingo',
+    			type: 'Get',
+    			error: function(error){
+    				console.log("ERROR: " + JSON.stringify(error));
+    			},
+    			success: function(response){
+    				if(app.currentPageId != 'login_page' && app.currentPageId != 'register_page' && app.currentPageId != 'recovery_page'){
+    					console.log("SUCCESS: " + JSON.stringify(response));
+    					if(response.bingo.itemsNumber > 0){
+    						for(var i = 0; i < response.bingo.itemsNumber; i++){
+    							var bingo = response.bingo.items[i];
+
+    							if(!app.inBingosArray(bingo)){
+    								app.bingos.push(bingo);
+    							}
+    						}
+
+    						if(!app.bingoIsActive && app.currentPageId != 'chat_page'){
+    							app.splashBingo(response);
+    						}
+
+    					}
+
+    					setTimeout(app.checkBingo, 10000);
+    				}
+    			}
+    		});
+        }
+    },
+
+
+    splashBingo: function(response){
+    	//alert(app.bingos.length);
+    	for(var i in app.bingos){
+    		if(typeof(app.bingos[i]) !== "undefined" ){
+    			//alert("Bingo " + i + ": " + JSON.stringify(app.bingos[i]));
+    			var bingo = app.bingos[i];
+    			var template = $('#bingoTemplate').html();
+
+    			userImageUrlTemplate = response.bingo.imagesStoragePath
+                   	+ '/'
+                    + '[IMAGE_ID]'
+                    + '.'
+                    + '[IMAGE_EXT]'
+                ;
+
+                var userImageUrl_1 = userImageUrlTemplate.replace('[IMAGE_ID]', bingo.userImageId_1);
+                userImageUrl_1 = userImageUrl_1.replace('[IMAGE_EXT]', bingo.imageExt_1);
+                var userImageUrl_2 = userImageUrlTemplate.replace('[IMAGE_ID]', bingo.userImageId_2);
+                userImageUrl_2 = userImageUrl_2.replace('[IMAGE_EXT]', bingo.imageExt_2);
+
+    			template = template.replace("[USER_IMAGE_URL_1]", userImageUrl_1);
+    			template = template.replace("[USER_IMAGE_URL_2]", userImageUrl_2);
+    			template = template.replace("[USER_ID]", bingo.userId);
+    			template = template.replace(/\[USERNICK\]/g, bingo.nickName);
+
+    			$('#bingo_page').css({"background":"url('" + userImageUrl_2 + "') no-repeat center center", "background-size":"cover"}).html(template);
+    			app.showPage('bingo_page');
+
+    			app.bingoIsActive = true;
+    			app.setBingoAsSplashed(bingo, i);
+    			break;
+    		}
+        }
+    },
+
+
+    setBingoAsSplashed: function(bingo, i){
+
+    	var data = JSON.stringify(bingo);
+
+    	$.ajax({
+           	url: app.apiUrl + '/user/bingo/splashed',
+           	type: 'Post',
+           	data: data,
+           	error: function(error){
+           		console.log("ERROR: " + JSON.stringify(error));
+           	},
+           	success: function(response){
+           		console.log(JSON.stringify(response));
+           		if(response.success){
+           			app.bingos.splice(i, 1);
+           		}
+           	}
+        });
+    },
+
+
+    inBingosArray: function(bingo){
+    	for(var i in app.bingos){
+    		if(app.bingos[i].id === bingo.id){
+    			return true;
+    		}
+    	}
+
+    	return false;
+    },
+
+
+    setUserNotificationAsRead: function(notifId, clickedObj){
+
+    	$.ajax({
+           	url: app.apiUrl + '/user/notification/' + notifId + '/read',
+           	type: 'Post',
+           	error: function(error){
+           		console.log("ERROR: " + JSON.stringify(error));
+           	},
+           	success: function(response){
+           		console.log(JSON.stringify(response));
+           		$(clickedObj).addClass("isRead");
+           	}
+        });
+    },
+
+
 
 	
 	
