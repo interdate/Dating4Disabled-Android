@@ -65,6 +65,8 @@ var app = {
 	swiper: null,
     bingoIsActive: false,
     bingos: [],
+    showReminder: true,
+    version: '1.0.8',
 
 		
 	init: function(){
@@ -73,6 +75,8 @@ var app = {
 		app.pictureSource = navigator.camera.PictureSourceType;
         app.destinationType = navigator.camera.DestinationType;
         app.encodingType = navigator.camera.EncodingType;
+
+        app.showReminder = true;
 
 
 		app.ajaxSetup();
@@ -97,17 +101,22 @@ var app = {
 			beforeSend: function(xhr){
 				//alert(user + ':' + pass);
 				xhr.setRequestHeader ("Authorization", "Basic " + btoa ( user + ":" + pass) );
+				xhr.setRequestHeader ("appVersion", app.version);
 			},		
 			statusCode:{
 				
 				401: function(response, textStatus, xhr){
-					
+
 					app.stopLoading();
 					app.showPage('login_page');
 					document.removeEventListener("backbutton", app.back, false);
 					app.alert(response.responseText);
 					//app.alert('You entered incorrect data, please try again');
-				}
+				},
+
+				406: function(response, textStatus, xhr){
+				    $('body').html(response.responseText);
+                }
 		
 			},
 			
@@ -206,12 +215,38 @@ var app = {
 	},
 
 	loggedUserInit: function(){
+	    app.checkIfUpdatePayment();
 		app.searchFuncsMainCall = true;
 		app.setBannerDestination();
 		app.checkNewMessages();
 		app.checkBingo();
 		//app.pushNotificationInit();
 		app.sendUserPosition();
+	},
+
+	checkIfUpdatePayment: function(){
+	    $('.admNotif').hide();
+	    if(app.showReminder){
+	        $.ajax({
+                url: app.apiUrl + '/user/check/update/payment',
+                error: function(response){
+                    //alert(JSON.stringify(response));
+                },
+                success: function(response, status){
+                    //alert(JSON.stringify(response));
+                    if(response.success){
+                        response.body.replace('href="(.*)"', 'onclick="app.getSubscription();"');
+                        $('.admNotif').show().find('.notifContent').html(response.body).find('a').attr('href','#').attr('onclick', 'app.getSubscription();');
+                        //alert(response.body);
+                    }
+                }
+            });
+	    }
+	},
+
+	closeReminder: function(){
+	    $('.admNotif').slideUp('slow');
+	    app.showReminder = false;
 	},
 
 
@@ -252,8 +287,6 @@ var app = {
 					app.loggedUserInit();
 					$(window).unbind("scroll");
 					window.scrollTo(0, 0);
-
-
 				}
 			}
 		});
@@ -1330,7 +1363,7 @@ var app = {
        			messageToAdmin: messageToAdmin,
        		}),
        		error: function(error){
-       			alert(JSON.stringify(error));
+       			app.alert(JSON.stringify(error));
        		},
        		success: function(response, status, xhr){
        		   $('#messageToAdmin').val('');
@@ -1875,6 +1908,14 @@ var app = {
 	},
 
 	getSubscription: function(){
+
+		userId = window.localStorage.getItem('userId');
+		var ref = window.open('http://m.dating4disabled.com/subscription/?app_user_id=' + userId, '_blank', 'location=yes');
+
+
+
+		/*
+
 		app.showPage('subscription_page');
 		$(".subscr_quest").unbind('click');
 		$(".subscr_quest").click(function(){
@@ -1910,7 +1951,7 @@ var app = {
 
 
 		});
-
+		*/
 
 	},
 
@@ -2110,7 +2151,7 @@ var app = {
     			   //app.container.find('.userGender').html(app.getuserGender()).trigger('create');
     			},
     			error: function(err){
-    			   alert(JSON.stringify(err));
+    			   app.alert(JSON.stringify(err));
     			}
     		});
     	},

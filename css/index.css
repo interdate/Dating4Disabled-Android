@@ -1944,6 +1944,15 @@ html, body {height: 100%; position:relative;}
     padding-left: 20px;
 }
 
+.admNotif{
+ 	margin-bottom: 15px;
+ 	border-radius: 15px;
+ 	background: #fff;
+ 	padding: 10px;
+ 	box-sizing: border-box;
+ 	box-shadow: 0px 0px 1px #bcbcbc;
+ }
+
 
 
 
