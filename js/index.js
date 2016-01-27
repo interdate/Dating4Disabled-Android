@@ -66,7 +66,7 @@ var app = {
     bingoIsActive: false,
     bingos: [],
     showReminder: true,
-    version: '1.0.8',
+    version: '1.0.9',
 
 		
 	init: function(){
@@ -319,6 +319,7 @@ var app = {
 				user = window.localStorage.getItem("user");
 				pass = window.localStorage.getItem("pass");
 				xhr.setRequestHeader ("Authorization", "Basic " + btoa ( user + ":" + pass) );
+				xhr.setRequestHeader ("appVersion", app.version);
 			},
 			success: function(data, status){
 				if(data.userId > 0){
